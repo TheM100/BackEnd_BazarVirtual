@@ -1,0 +1,15 @@
+const express = require("express");
+const router = express.Router();
+const userSchema = require("../models/products");
+// const createJWT = require("../middlewares/authorization");
+
+router.get("/", async (req, res) => {
+  try {
+    const AllProducts = await userSchema.find();
+    res.send({ msg: "Todos los productos de la coleccion Products" });
+  } catch (error) {
+    res
+      .status(400)
+      .send({ msg: "No se pudo extraer a los productos", error: error });
+  }
+});
