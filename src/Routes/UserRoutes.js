@@ -67,13 +67,13 @@ router.post('/login', async (req, res)=>{
         });
 
         if(!user){
-            res.status(404).send({msg:"user not found"});
+           return res.status(404).send({msg:"user not found"});
         }
         if(!(await bcrypt.compare(password, user.password))){
             return res.status(401).send({msg:"Incorrect password"})
         }else{
             const token = createJWT({_id:user._id, email:user.email, role:user.role });
-            res.status(201).send({msg:"login successfull", data: token})
+            return res.status(201).send({msg:"login successfull", data: token})
         }
 
         
