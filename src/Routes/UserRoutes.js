@@ -24,27 +24,38 @@ try {
 }
 })
 
-router.post("/register", async (req, res)=>{
-    const {firstName, email, role, password} = req.body;
+router.post("/register", async (req, res) => {
+    const { userName, email, role, password } = req.body;
     try {
-        const salt = await bcrypt.genSalt(10)
-        const encryptedPassword = await bcrypt.hash(password,salt);
-        const user = await userSchema.create({
-            firstName,
+        // Verificar si el correo electrónico ya está registrado
+        const existingMail = await userSchema.findOne({ email: email });
+        const existingUserName = await userSchema.findOne({ userName: userName });
+        if (existingMail) {
+            return res.status(400).send({ msg: 'El correo electrónico ya está registrado.' });
+        }
+        if (existingUserName) {
+            return res.status(400).send({ msg: 'Nombre de usuario registrado, prueba con otro.' });
+        }
+
+        // Encriptar la contraseña
+        const salt = await bcrypt.genSalt(10);
+        const encryptedPassword = await bcrypt.hash(password, salt);
+
+        // Crear un nuevo usuario
+        const user = new userSchema({
+            userName,
             email,
             role,
             password: encryptedPassword
-        })
+        });
+
         await user.save();
-        res.status(200).send({msg:'Usuario creado con exito!'})
-        
+        res.status(200).send({ msg: 'Usuario creado con éxito!' });
+
     } catch (error) {
-
-        res.status(400).send({msg:"Usuario no guardado", Error: error})
-        
+        res.status(400).send({ msg: "Usuario no guardado", Error: error });
     }
-
-})
+});
 
 router.post('/login', async (req, res)=>{
     try {
