@@ -6,10 +6,15 @@ const userSchema = require("../models/products");
 router.get("/", async (req, res) => {
   try {
     const AllProducts = await userSchema.find();
-    res.send({ msg: "Todos los productos de la coleccion Products" });
+    res.send({
+      msg: "Todos los productos de la coleccion Products",
+      data: AllProducts,
+    });
   } catch (error) {
     res
       .status(400)
       .send({ msg: "No se pudo extraer a los productos", error: error });
   }
 });
+
+module.exports = router;

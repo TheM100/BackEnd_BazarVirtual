@@ -23,6 +23,6 @@ const productsEsquema = new mongooselib.Schema({
   },
 });
 
-const userSchema = mongooselib.model("Products", userEsquema, "products"); //primer parametro:nombre_modelo, segundo parametro: nombre_esquema_a_utilizar, tercer parametro: nombre-de-coleccion-en-la-BD
+const userSchema = mongooselib.model("Products", productsEsquema, "products"); //primer parametro:nombre_modelo, segundo parametro: nombre_esquema_a_utilizar, tercer parametro: nombre-de-coleccion-en-la-BD
 
 module.exports = userSchema;
