@@ -44,28 +44,6 @@ router.post("/register", async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
-router.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const user = await userSchema.findOne({
-      email: email,
-    });
-
-    if (!user) {
-      res.status(404).send({ msg: "user not found" });
-    }
-    if (!(await bcrypt.compare(password, user.password))) {
-      return res.status(401).send({ msg: "Incorrect password" });
-    } else {
-      const token = createJWT({
-        _id: user._id,
-        email: user.email,
-        role: user.role,
-      });
-      res.status(201).send({ msg: "login successfull", data: token });
-=======
 router.post("/register", async (req, res) => {
     const { userName, email, role, password } = req.body;
     try {
@@ -121,7 +99,6 @@ router.post('/login', async (req, res)=>{
         
     } catch (error) {
         res.status(400).send({msg:"Invalid login", Error:error})
->>>>>>> ad5035f7df584a9d3bf0c12b468faa7b48e0e702
     }
   } catch (error) {
     res.status(400).send({ msg: "Invalid login", Error: error });
