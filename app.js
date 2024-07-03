@@ -6,7 +6,7 @@ const PORT = 3001;
 
 
 const userRoutes = require("./src/Routes/UserRoutes") //importando las routes de users
-const {connect} = require('./utils/ConectionDB')
+const {connect} = require('./src/dataBase/ConectionDB')
 
 
 connect();
