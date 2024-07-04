@@ -19,6 +19,6 @@ const eventsEsquema = new mongooselib.Schema({
   },
 });
 
-const userSchema = mongooselib.model("Events", userEsquema, "events"); //primer parametro:nombre_modelo, segundo parametro: nombre_esquema_a_utilizar, tercer parametro: nombre-de-coleccion-en-la-BD
+const eventsSchema = mongooselib.model("Events", eventsEsquema, "events"); //primer parametro:nombre_modelo, segundo parametro: nombre_esquema_a_utilizar, tercer parametro: nombre-de-coleccion-en-la-BD
 
-module.exports = userSchema;
+module.exports = eventsSchema;
