@@ -29,5 +29,18 @@ router.get("/:id", async (req, res) => {
       .send({ msg: "Producto encontrado", data: productFromId });
   }
 });
+router.get("/brand/:brandId", async (req, res) => {
+  const { brandId } = req.params;
+
+  const productsFromBrandId = await productsSchema.find({ brandId: brandId });
+
+  if (!productsFromBrandId || productsFromBrandId.length === 0) {
+    return res.status(404).send({ msg: "No hay productos de esta marca" });
+  } else {
+    return res
+      .status(200)
+      .send({ msg: "Productos encontrados", data: productsFromBrandId });
+  }
+});
 
 module.exports = router;

@@ -27,12 +27,12 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-  const { firstName, email, role, password } = req.body;
+  const { username, email, role, password } = req.body;
   try {
     const salt = await bcrypt.genSalt(10);
     const encryptedPassword = await bcrypt.hash(password, salt);
     const user = await userSchema.create({
-      firstName,
+      username,
       email,
       role,
       password: encryptedPassword,
@@ -45,17 +45,17 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-  const { userName, email, role, password } = req.body;
+  const { username, email, role, password } = req.body;
   try {
     // Verificar si el correo electrónico ya está registrado
     const existingMail = await userSchema.findOne({ email: email });
-    const existingUserName = await userSchema.findOne({ userName: userName });
+    const existingUsername = await userSchema.findOne({ username: username });
     if (existingMail) {
       return res
         .status(400)
         .send({ msg: "El correo electrónico ya está registrado." });
     }
-    if (existingUserName) {
+    if (existingUsername) {
       return res
         .status(400)
         .send({ msg: "Nombre de usuario registrado, prueba con otro." });
@@ -67,7 +67,7 @@ router.post("/register", async (req, res) => {
 
     // Crear un nuevo usuario
     const user = new userSchema({
-      userName,
+      username,
       email,
       role,
       password: encryptedPassword,

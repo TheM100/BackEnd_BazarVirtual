@@ -1,7 +1,7 @@
 const mongooselib = require("mongoose");
 
 const userEsquema = new mongooselib.Schema({
-  userName: {
+  username: {
     type: String,
     required: true,
     unique: true,
