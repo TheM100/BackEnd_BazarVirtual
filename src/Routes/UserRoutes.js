@@ -26,6 +26,62 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/marcas", async (req, res) => {
+  try {
+    const AllMarcas = await userSchema.find({ role: "marca" });
+    res.send({
+      msg: "Todas las marcas de la coleccion Users",
+      data: AllMarcas,
+    });
+  } catch (error) {
+    res
+      .status(400)
+      .send({ msg: "No se pudo extraer a las marcas", error: error });
+  }
+});
+
+router.get("/marcas/:marcaId", async (req, res) => {
+  try {
+    const marcaFromId = await userSchema.findOne();
+    res.send({
+      msg: "Todas las marcas de la coleccion Users",
+      data: marcaFromId,
+    });
+  } catch (error) {
+    res
+      .status(400)
+      .send({ msg: "No se pudo extraer a los usuarios", error: error });
+  }
+});
+
+router.get("/bazares", async (req, res) => {
+  try {
+    const AllBazares = await userSchema.find({ role: "bazar" });
+    res.send({
+      msg: "Todos los bazares de la coleccion Users",
+      data: AllBazares,
+    });
+  } catch (error) {
+    res
+      .status(400)
+      .send({ msg: "No se pudo extraer a los bazares", error: error });
+  }
+});
+
+router.get("/bazares/:bazarId", async (req, res) => {
+  try {
+    const bazarFromId = await userSchema.find();
+    res.send({
+      msg: "Todos los usuarios de la coleccion Users",
+      data: bazarFromId,
+    });
+  } catch (error) {
+    res
+      .status(400)
+      .send({ msg: "No se pudo extraer a los usuarios", error: error });
+  }
+});
+
 router.post("/register", async (req, res) => {
   const { username, email, role, password } = req.body;
   try {
