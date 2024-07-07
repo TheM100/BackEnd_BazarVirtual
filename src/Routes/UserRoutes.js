@@ -41,10 +41,12 @@ router.get("/marcas", async (req, res) => {
 });
 
 router.get("/marcas/:marcaId", async (req, res) => {
+  const { marcaId } = req.params;
+
   try {
-    const marcaFromId = await userSchema.findOne();
+    const marcaFromId = await userSchema.findOne({ _id: marcaId });
     res.send({
-      msg: "Todas las marcas de la coleccion Users",
+      msg: "Única marca de la colección Users",
       data: marcaFromId,
     });
   } catch (error) {
@@ -69,10 +71,11 @@ router.get("/bazares", async (req, res) => {
 });
 
 router.get("/bazares/:bazarId", async (req, res) => {
+  const { bazarId } = req.params;
   try {
-    const bazarFromId = await userSchema.find();
+    const bazarFromId = await userSchema.findOne({ id: bazarId });
     res.send({
-      msg: "Todos los usuarios de la coleccion Users",
+      msg: "Único bazar de la coleccion Users",
       data: bazarFromId,
     });
   } catch (error) {
