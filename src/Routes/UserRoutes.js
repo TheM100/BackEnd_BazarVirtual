@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const userSchema = require("../models/users");
+const usersBazarSchema = require("../models/bazar/bazarUsers")
 const createJWT = require("../middlewares/authentication");
 
 // router.get('/', (req, res) => {
@@ -82,23 +83,6 @@ router.get("/bazares/:bazarId", async (req, res) => {
   }
 });
 
-router.post("/register", async (req, res) => {
-  const { username, email, role, password } = req.body;
-  try {
-    const salt = await bcrypt.genSalt(10);
-    const encryptedPassword = await bcrypt.hash(password, salt);
-    const user = await userSchema.create({
-      username,
-      email,
-      role,
-      password: encryptedPassword,
-    });
-    await user.save();
-    res.status(200).send({ msg: "Usuario creado con exito!" });
-  } catch (error) {
-    res.status(400).send({ msg: "Usuario no guardado", Error: error });
-  }
-});
 
 router.post("/register", async (req, res) => {
   const { username, email, role, password } = req.body;
@@ -140,9 +124,15 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await userSchema.findOne({
-      email: email,
-    });
+    const schemas = [userSchema, usersBazarSchema];
+
+    let user = null;
+
+    // Iterar sobre cada esquema para buscar al usuario por email
+    for (let schema of schemas) {
+      user = await schema.findOne({ email });
+      if (user) break; // Si encontramos al usuario, salimos del bucle
+    }
 
     if (!user) {
       return res.status(404).send({ msg: "user not found" });
