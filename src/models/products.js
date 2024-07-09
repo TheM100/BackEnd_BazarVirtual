@@ -21,6 +21,10 @@ const productsEsquema = new mongooselib.Schema({
     type: String,
     required: true,
   },
+  category: {
+    type: String,
+    required: true,
+  },
 });
 
 const productsSchema = mongooselib.model(
