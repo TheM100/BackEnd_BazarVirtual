@@ -1,7 +1,7 @@
 const mongooselib = require("mongoose");
 
 const productsEsquema = new mongooselib.Schema({
-  username: {
+  brandId: {
     type: String,
     required: true,
   },
