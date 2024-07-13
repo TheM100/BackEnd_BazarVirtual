@@ -10,6 +10,7 @@ const userRoutes = require("./src/Routes/UserRoutes"); //importando las routes d
 const productRoutes = require("./src/Routes/ProductsRoutes");
 const eventsRoutes = require("./src/Routes/EventsRoutes");
 const bazarRoutes = require('./src/Routes/bazarRoutes')
+const marcaRoutes = require("./src/Routes/marcaRoutes")
 const { connect } = require("./src/dataBase/ConectionDB");
 
 
@@ -28,6 +29,7 @@ app.use("/users", userRoutes); //usamos endpoints de users
 app.use("/products", productRoutes); //usamos endpoints de products
 app.use("/events", eventsRoutes); //usamos endpoints de events
 app.use("/bazar", bazarRoutes);
+app.use("/marca", marcaRoutes);
 
 app.listen(PORT, () => {
   console.log("server is ready in port " + PORT);

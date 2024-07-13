@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const userSchema = require("../models/users");
 const usersBazarSchema = require("../models/bazar/bazarUsers")
+const userMarcaSchema = require("../models/marca/usersMarca")
 const createJWT = require("../middlewares/authentication");
 
 // router.get('/', (req, res) => {
@@ -127,11 +128,11 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.post("/login", async (req, res) => {
+router.post("/login", async (req, res) => { //este enPoint es usado por los 3 tipos de users
   try {
     const { email, password } = req.body;
 
-    const schemas = [userSchema, usersBazarSchema];
+    const schemas = [userSchema, usersBazarSchema, userMarcaSchema];
 
     let user = null;
 
