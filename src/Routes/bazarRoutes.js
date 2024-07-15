@@ -136,7 +136,7 @@ router.get("/", async (req, res) => {
         email,
         wepPage:"",
         socialNetworks: parsedSocialNetworks,
-        profilePicture:"" ,
+        profilePicture:"https://i.pinimg.com/236x/c4/02/5d/c4025d4031edfa78ce3dd60a144f77ed.jpg" ,
         password: encryptedPassword,
         role,
       });
