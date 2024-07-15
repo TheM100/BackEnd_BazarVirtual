@@ -5,72 +5,8 @@ const validateDate = require("../middlewares/bazarMiddle")
 const bcrypt = require("bcrypt");
 const usersBazarSchema = require("../models/bazar/bazarUsers")
 const createJWT = require("../middlewares/authentication");
-const fs = require('fs');
-const multer = require('multer');
-
-//invocando a multer para carga de imagenes
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 
 
-
-//EndPoint Register:
-router.post("/register", upload.single("profilePicture"), async (req, res) => {
-  const { username, email, wepPage, socialNetworks, password, role } = req.body;
-
-  try {
-    // Verificar si el correo electrónico ya está registrado
-    const existingMail = await usersBazarSchema.findOne({ email: email });
-    const existingBazarName = await usersBazarSchema.findOne({ username: username });
-    if (existingMail) {
-      return res.status(400).send({ msg: "El correo electrónico ya está registrado." });
-    }
-    if (existingBazarName) {
-      return res.status(400).send({ msg: "Nombre de usuario registrado, prueba con otro." });
-    }
-
-    // Encriptar la contraseña
-    const salt = await bcrypt.genSalt(10);
-    const encryptedPassword = await bcrypt.hash(password, salt);
-
-    //declarando constante con el path de la img
-    const defaultProfilePicturePath = "utils/DefaultProfile.jpg";
-    let defaultProfilePicture;
-
-    //leyendo el path para extraer la img
-    try {
-      defaultProfilePicture = fs.readFileSync(defaultProfilePicturePath);
-    } catch (err) {
-      console.error(`Error reading default profile picture: ${err.message}`);
-      return res.status(500).send({ msg: "Error reading default profile picture", error: err.message });
-    }
-
-    //se asigna dicha imagen a constante profilePicture para guardarla abajo
-    const profilePicture = req.file ? req.file.buffer : defaultProfilePicture;
-    
-
-    // Crear un nuevo usuario
-    const user = new usersBazarSchema({
-      username,
-      email,
-      wepPage,
-      socialNetworks, // Si socialNetworks es un array de objetos, parsearlo
-      profilePicture,
-      password: encryptedPassword,
-      role,
-    });
-
-    await user.save();
-    res.status(200).send({ msg: "Usuario creado con éxito!" });
-  } catch (error) {
-    console.error(`Error creating user: ${error.message}`);
-    res.status(400).send({ msg: "Usuario no guardado", error: error });
-  }
-});
-
-//-------------
-
-//-------------
 
 router.get("/", async (req, res) => {
     try {
@@ -168,6 +104,79 @@ router.get("/", async (req, res) => {
       res.status(400).send({ msg: "can't create date", error: error });
     }
   });
+
+
+  router.post("/register", async (req, res) => {
+    const { username, email, wepPage, socialNetworks, password, role } = req.body;
+  
+    try {
+      const existingMail = await usersBazarSchema.findOne({ email: email });
+      const existingBazarName = await usersBazarSchema.findOne({ username: username });
+      if (existingMail) {
+        return res.status(400).send({ msg: "El correo electrónico ya está registrado." });
+      }
+      if (existingBazarName) {
+        return res.status(400).send({ msg: "Nombre de usuario registrado, prueba con otro." });
+      }
+  
+      // Encriptar la contraseña
+      const salt = await bcrypt.genSalt(10);
+      const encryptedPassword = await bcrypt.hash(password, salt);
+      
+      let parsedSocialNetworks = [];
+      if (Array.isArray(socialNetworks)) {
+      parsedSocialNetworks = socialNetworks.map(network => ({
+        platform: network.platform,
+        url: network.url
+      }));
+    }
+  
+      const user = new usersBazarSchema({
+        username,
+        email,
+        wepPage:"",
+        socialNetworks: parsedSocialNetworks,
+        profilePicture:"https://i.pinimg.com/236x/c4/02/5d/c4025d4031edfa78ce3dd60a144f77ed.jpg" ,
+        password: encryptedPassword,
+        role,
+      });
+  
+      await user.save();
+      res.status(200).send({ msg: "Usuario creado con éxito!" });
+    } catch (error) {
+      console.error(`Error creating user: ${error.message}`);
+      res.status(400).send({ msg: "Usuario no guardado", error: error });
+    }
+  });
+
+
+  router.put('/updateProfile/:id', async (req, res)=>{
+    const _id = req.params.id;
+    const { username, wepPage, socialNetworks } = req.body; //agregar el perfilPicture
+    try {
+
+      const user = await usersBazarSchema.findById(_id);
+
+      if (!user) {
+        return res.status(404).send('Usuario no encontrado');
+      }
+
+      if (username) user.username = username;
+      user.wepPage = wepPage;
+      user.socialNetworks = socialNetworks;
+
+      await user.save();
+
+      res.send(user);
+  
+      
+    } catch (error) {
+      res.status(500).send('Error al actualizar el usuario');
+    }
+  } )
+
+
+  
 
   
   module.exports = router;

@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const userSchema = require("../models/users");
 const usersBazarSchema = require("../models/bazar/bazarUsers")
+const userMarcaSchema = require("../models/marca/usersMarca")
 const createJWT = require("../middlewares/authentication");
 
 // router.get('/', (req, res) => {
@@ -90,6 +91,7 @@ router.get("/bazares/:bazarId", async (req, res) => {
 router.post("/register", async (req, res) => {
   const { username, email, role, password } = req.body;
   try {
+    
     // Verificar si el correo electrónico ya está registrado
     const existingMail = await userSchema.findOne({ email: email });
     const existingUsername = await userSchema.findOne({ username: username });
@@ -103,18 +105,21 @@ router.post("/register", async (req, res) => {
         .status(400)
         .send({ msg: "Nombre de usuario registrado, prueba con otro." });
     }
-
+    console.log()
     // Encriptar la contraseña
     const salt = await bcrypt.genSalt(10);
     const encryptedPassword = await bcrypt.hash(password, salt);
+    // console.log(encryptedPassword)
 
     // Crear un nuevo usuario
     const user = new userSchema({
+  
       username,
       email,
-      role,
       password: encryptedPassword,
+      role,
     });
+    console.log(user)
 
     await user.save();
     res.status(200).send({ msg: "Usuario creado con éxito!" });
@@ -123,11 +128,11 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.post("/login", async (req, res) => {
+router.post("/login", async (req, res) => { //este enPoint es usado por los 3 tipos de users
   try {
     const { email, password } = req.body;
 
-    const schemas = [userSchema, usersBazarSchema];
+    const schemas = [userSchema, usersBazarSchema, userMarcaSchema];
 
     let user = null;
 

@@ -27,8 +27,8 @@ const BazarUsersEsquema = new mongooselib.Schema({
      
   },
   profilePicture: {
-    type: Buffer,
-    required:true 
+    type: String,
+    default: '',
   },
   password: {
     type: String,

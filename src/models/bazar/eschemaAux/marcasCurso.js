@@ -8,7 +8,7 @@ profile: {
     required: true,
     },
 
-nameBazar: {
+nameMarca: {
     type: String,
     required: true,
     },
