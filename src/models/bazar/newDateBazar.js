@@ -5,8 +5,8 @@ const marcasCursoEsquema = require('./eschemaAux/marcasCurso')
 const newDateBazarEsquema = new mongooselib.Schema({
 createdBy: {
     type:String,
-    // type: mongooselib.Schema.Types.ObjectId,
-    //     ref: 'Users',
+    type: mongooselib.Schema.Types.ObjectId,
+        ref: 'Users',
         required: true
     },
   place: {
