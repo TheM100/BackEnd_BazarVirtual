@@ -91,6 +91,37 @@ router.get("/", async (req, res) => {
   });
 
 
+  router.get("/datesUser/:_idUser", async (req,res)=>{
+    try {
+      const idUser = req.params._idUser;
+      
+      const dates = await dateBazarSchema.find({ createdBy: `${idUser}`} );
+      console.log(dates)
+      if(dates){
+        res.status(200).json({
+          success: true,
+          message: 'Dates de tu bazar:',
+          data: dates
+        });
+      }else{
+        res.status(404).json({
+          success: false,
+          message: 'no se encontraron fechas de este bazar'
+        });
+      }
+      
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message
+      });
+    }
+  });
+
+  
+
+
   router.post("/createDate", validateDate, async (req, res) => {
     try {
       let newDate = req.body;
@@ -98,10 +129,10 @@ router.get("/", async (req, res) => {
       const date = await dateBazarSchema.create(newDate);
       
   
-      res.status(201).send({ msg: "Date created", data: date });
+      res.status(201).send({ msg: "Fecha Creada con exito!"});
     } catch (error) {
       console.log("error ", error);
-      res.status(400).send({ msg: "can't create date", error: error });
+      res.status(400).send({ msg: "No fue posible crear la fecha", error: error });
     }
   });
 
