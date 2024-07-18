@@ -1,6 +1,12 @@
 const mongooselib = require("mongoose");
 
 const productsEsquema = new mongooselib.Schema({
+  createdBy: {
+    type: String,
+    type: mongooselib.Schema.Types.ObjectId,
+    ref: "UsersMarca",
+    required: true,
+  },
   brandId: {
     type: String,
     required: true,
