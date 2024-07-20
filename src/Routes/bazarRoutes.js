@@ -207,6 +207,27 @@ router.get("/", async (req, res) => {
   } )
 
 
+  router.delete('/datesBazares/:bazarId/events/:eventId', async (req, res)=>{
+    const { bazarId, eventId } = req.params;
+    try {
+      // Buscar el documento y eliminar el evento
+      const result = await dateBazarSchema.findByIdAndUpdate(
+          bazarId,
+          { $pull: { events: { _id: eventId } } },
+          { new: true } // Opcional: retorna el documento actualizado
+      );
+      if (!result) {
+          return res.status(404).json({ msj: 'Bazar no encontrado' });
+      }
+
+      res.status(200).json({ msj: 'Evento eliminado', result });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ msj: 'Error al eliminar el evento', error });
+  }
+   })
+
+
   
 
   
