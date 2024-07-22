@@ -6,7 +6,7 @@ const newDateBazarEsquema = new mongooselib.Schema({
 createdBy: {
     type:String,
     type: mongooselib.Schema.Types.ObjectId,
-        ref: 'Users',
+        ref: 'usersBazar',
         required: true
     },
   place: {

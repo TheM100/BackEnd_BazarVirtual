@@ -20,6 +20,7 @@ router.get("/", async (req, res) => {
     }
   });
 
+
   router.get("/usersBazar", async (req, res) => {
     try {
       const AllUsersBazar = await usersBazarSchema.find();
@@ -59,6 +60,23 @@ router.get("/", async (req, res) => {
       });
     }
   });
+
+  router.get("/bazarDates", async (req, res) => {
+    try {
+      const allDatesBazares = await dateBazarSchema.find().populate({ //uso de populate para poblar el campo createdBy con id del bazar creador y profile picture
+        path: 'createdBy',
+        select: 'profilePicture' // Selecciona solo la imagen de perfil del usuario
+    }).exec();
+
+      res.send({
+        msg: "Todas las fechas disponibles",
+        data: allDatesBazares,
+      });
+    } catch (error) {
+      res.status(400).send({ msg: "No fue posible extraer las fechas de los bazares:)", error: error }); 
+    }
+  });
+
 
   
 
@@ -203,6 +221,30 @@ router.get("/", async (req, res) => {
       
     } catch (error) {
       res.status(500).send('Error al actualizar el usuario');
+    }
+  } )
+
+
+  router.put('/updateMarcasCurso/:id', async (req, res)=>{
+    const _id = req.params.id;
+    const {profile, nameMarca } = req.body; //agregar el perfilPicture
+    try {
+
+      const date = await dateBazarSchema.findById(_id);
+
+      if (!date) {
+        return res.status(404).send('Fecha no encontrada');
+      }
+
+      date.marcasCurso.push({ profile, nameMarca });
+
+      await date.save();
+
+      res.send(date);
+  
+      
+    } catch (error) {
+      res.status(500).send('Error al actualizar las marcas en la fecha deseada');
     }
   } )
 
