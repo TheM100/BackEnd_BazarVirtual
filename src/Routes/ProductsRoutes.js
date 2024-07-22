@@ -20,7 +20,16 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
 
-  const productFromId = await productsSchema.findOne({ _id: id });
+  const productFromId = await productsSchema
+    .findOne({ _id: id })
+    .populate({
+      //uso de populate para poblar el campo createdBy con id del bazar creador y profile picture
+      path: "createdBy",
+      select: "profilePicture", // Selecciona solo la imagen de perfil del usuario
+      select: "username",
+    })
+    .exec();
+  console.log(productFromId);
   if (!productFromId) {
     return res.status(404).send({ msg: "Product not found" });
   } else {
@@ -29,11 +38,10 @@ router.get("/:id", async (req, res) => {
       .send({ msg: "Producto encontrado", data: productFromId });
   }
 });
+
 router.get("/brand/:brandId", async (req, res) => {
   const { brandId } = req.params;
-
-  const productsFromBrandId = await productsSchema.find({ brandId: brandId });
-
+  const productsFromBrandId = await productsSchema.find({ createdBy: brandId });
   if (!productsFromBrandId || productsFromBrandId.length === 0) {
     return res.status(404).send({ msg: "No hay productos de esta marca" });
   } else {
