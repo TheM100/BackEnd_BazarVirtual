@@ -7,10 +7,6 @@ const productsEsquema = new mongooselib.Schema({
     ref: "UsersMarca",
     required: true,
   },
-  brandId: {
-    type: String,
-    required: true,
-  },
   title: {
     type: String,
     required: true,
