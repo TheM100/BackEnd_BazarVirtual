@@ -29,7 +29,6 @@ router.get("/:id", async (req, res) => {
       select: "username",
     })
     .exec();
-  console.log(productFromId);
   if (!productFromId) {
     return res.status(404).send({ msg: "Product not found" });
   } else {
@@ -41,7 +40,6 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
-  console.log(req.body);
   const { productImage, title, price, description, category } = req.body;
   try {
     const productFromId = await productsSchema.findById(id);
@@ -75,7 +73,6 @@ router.get("/brand/:brandId", async (req, res) => {
 router.post("/newProduct", async (req, res) => {
   try {
     const newProduct = req.body;
-    console.log("newProduct ", newProduct);
     const product = await productsSchema.create(newProduct);
 
     res.status(201).send({ msg: "Nuevo Producto creado con exito!" });

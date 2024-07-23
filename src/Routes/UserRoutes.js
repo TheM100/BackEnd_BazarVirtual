@@ -103,7 +103,6 @@ router.post("/register", async (req, res) => {
         .status(400)
         .send({ msg: "Nombre de usuario registrado, prueba con otro." });
     }
-    console.log();
     // Encriptar la contraseña
     const salt = await bcrypt.genSalt(10);
     const encryptedPassword = await bcrypt.hash(password, salt);
@@ -118,7 +117,6 @@ router.post("/register", async (req, res) => {
         "https://i.pinimg.com/564x/57/00/c0/5700c04197ee9a4372a35ef16eb78f4e.jpg",
       role,
     });
-    console.log(user);
 
     await user.save();
     res.status(200).send({ msg: "Usuario creado con éxito!" });
