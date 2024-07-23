@@ -39,6 +39,27 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+router.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  console.log(req.body);
+  const { productImage, title, price, description, category } = req.body;
+  try {
+    const productFromId = await productsSchema.findById(id);
+    if (!productFromId) {
+      return res.status(404).send({ msg: "Product not found" });
+    }
+    if (title) productFromId.title = title;
+    productFromId.productImage = productImage;
+    productFromId.price = price;
+    productFromId.description = description;
+    productFromId.category = category;
+    await productFromId.save();
+    res.send(productFromId);
+  } catch (error) {
+    res.status(500).send("Error al actualizar el producto");
+  }
+});
+
 router.get("/brand/:brandId", async (req, res) => {
   const { brandId } = req.params;
   const productsFromBrandId = await productsSchema.find({ createdBy: brandId });
@@ -51,4 +72,37 @@ router.get("/brand/:brandId", async (req, res) => {
   }
 });
 
+router.post("/newProduct", async (req, res) => {
+  try {
+    const newProduct = req.body;
+    console.log("newProduct ", newProduct);
+    const product = await productsSchema.create(newProduct);
+
+    res.status(201).send({ msg: "Nuevo Producto creado con exito!" });
+  } catch (error) {
+    console.log("error ", error);
+    res
+      .status(400)
+      .send({ msg: "No fue posible crear el producto", error: error });
+  }
+});
 module.exports = router;
+
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const product = await productsSchema.findByIdAndDelete(id);
+
+    if (!product) {
+      return res.status(404).send({ msg: "Producto no encontrado" });
+    }
+
+    res
+      .status(200)
+      .send({ msg: "Producto eliminado con éxito", data: product });
+  } catch (error) {
+    console.error("Error al eliminar el producto:", error.message);
+    res.status(500).send({ msg: "Error al eliminar el producto" });
+  }
+});
