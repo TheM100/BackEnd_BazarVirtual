@@ -27,6 +27,10 @@ const userEsquema = new mongooselib.Schema({
     type: String,
     required: true,
   },
+  profilePicture: {
+    type: String,
+    default: "",
+  },
 });
 
 // const userSchema = mongooselib.model("Users", userEsquema, "users"); //primer parametro:nombre_modelo, segundo parametro: nombre_esquema_a_utilizar, tercer parametro: nombre-de-coleccion-en-la-BD
