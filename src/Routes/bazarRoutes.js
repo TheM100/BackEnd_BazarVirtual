@@ -85,7 +85,7 @@ router.get("/", async (req, res) => {
       const idDate = req.params.dateId;
       
       const date = await dateBazarSchema.findById(idDate);
-      console.log(date)
+      // console.log(date)
       if(date){
         res.status(200).json({
           success: true,
@@ -114,7 +114,7 @@ router.get("/", async (req, res) => {
       const idUser = req.params._idUser;
       
       const dates = await dateBazarSchema.find({ createdBy: `${idUser}`} );
-      console.log(dates)
+      // console.log(dates)
       if(dates){
         res.status(200).json({
           success: true,
@@ -143,7 +143,7 @@ router.get("/", async (req, res) => {
   router.post("/createDate", validateDate, async (req, res) => {
     try {
       let newDate = req.body;
-       console.log('newDate ', newDate);
+      //  console.log('newDate ', newDate);
       const date = await dateBazarSchema.create(newDate);
       
   
@@ -247,6 +247,35 @@ router.get("/", async (req, res) => {
       res.status(500).send('Error al actualizar las marcas en la fecha deseada');
     }
   } )
+
+
+  router.put('/updateDateBazar/:id', async (req, res)=>{
+    const _id = req.params.id;
+    const {place, date, time, events } = req.body; 
+    
+    try {
+
+      const existingDate  = await dateBazarSchema.findById(_id);
+
+      if (!existingDate ) {
+        return res.status(404).send('Fecha no encontrada');
+      }
+
+      existingDate.place = place
+      existingDate.date = date
+      existingDate.time = time
+      existingDate.events = events
+
+      const updatedDate = await existingDate.save();
+
+      res.send(updatedDate);
+  
+      
+    } catch (error) {
+      res.status(500).send('Error al actualizar las marcas en la fecha deseada');
+    }
+  } )
+
 
 
   router.delete('/datesBazares/:bazarId/events/:eventId', async (req, res)=>{
