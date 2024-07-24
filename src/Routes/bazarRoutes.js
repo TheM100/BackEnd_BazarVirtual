@@ -70,85 +70,92 @@ router.get("/bazarDates", async (req, res) => {
       })
       .exec();
 
-    res.send({
-      msg: "Todas las fechas disponibles",
-      data: allDatesBazares,
-    });
-  } catch (error) {
-    res
-      .status(400)
-      .send({
-        msg: "No fue posible extraer las fechas de los bazares:)",
-        error: error,
+      res.send({
+        msg: "Todas las fechas disponibles",
+        data: allDatesBazares,
       });
-  }
-});
+    } catch (error) {
+      res.status(400).send({ msg: "No fue posible extraer las fechas de los bazares:)", error: error }); 
+    }
+  });
 
-router.get("/dateById/:dateId", async (req, res) => {
-  try {
-    const idDate = req.params.dateId;
 
-    const date = await dateBazarSchema.findById(idDate);
-    if (date) {
-      res.status(200).json({
-        success: true,
-        message: "Dates con ese id:",
-        data: date,
-      });
-    } else {
-      res.status(404).json({
+  
+
+  router.get("/dateById/:dateId", async (req,res)=>{
+    try {
+      const idDate = req.params.dateId;
+      
+      const date = await dateBazarSchema.findById(idDate);
+      // console.log(date)
+      if(date){
+        res.status(200).json({
+          success: true,
+          message: 'Dates con ese id:',
+          data: date
+        });
+      }else{
+        res.status(404).json({
+          success: false,
+          message: 'No se encontro alguna fecha con ese ID'
+        });
+      }
+      
+    } catch (error) {
+      res.status(500).json({
         success: false,
-        message: "No se encontro alguna fecha con ese ID",
+        message: 'Error interno del servidor',
+        error: error.message
       });
     }
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error interno del servidor",
-      error: error.message,
-    });
-  }
-});
+  });
 
-router.get("/datesUser/:_idUser", async (req, res) => {
-  try {
-    const idUser = req.params._idUser;
 
-    const dates = await dateBazarSchema.find({ createdBy: `${idUser}` });
-    if (dates) {
-      res.status(200).json({
-        success: true,
-        message: "Dates de tu bazar:",
-        data: dates,
-      });
-    } else {
-      res.status(404).json({
+  router.get("/datesUser/:_idUser", async (req,res)=>{
+    try {
+      const idUser = req.params._idUser;
+      
+      const dates = await dateBazarSchema.find({ createdBy: `${idUser}`} );
+      // console.log(dates)
+      if(dates){
+        res.status(200).json({
+          success: true,
+          message: 'Dates de tu bazar:',
+          data: dates
+        });
+      }else{
+        res.status(404).json({
+          success: false,
+          message: 'no se encontraron fechas de este bazar'
+        });
+      }
+      
+    } catch (error) {
+      res.status(500).json({
         success: false,
-        message: "no se encontraron fechas de este bazar",
+        message: 'Error interno del servidor',
+        error: error.message
       });
     }
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error interno del servidor",
-      error: error.message,
-    });
-  }
-});
+  });
 
-router.post("/createDate", validateDate, async (req, res) => {
-  try {
-    let newDate = req.body;
-    const date = await dateBazarSchema.create(newDate);
+  
 
-    res.status(201).send({ msg: "Fecha Creada con exito!" });
-  } catch (error) {
-    console.log("error ", error);
-    res
-      .status(400)
-      .send({ msg: "No fue posible crear la fecha", error: error });
-  }
-});
+
+  router.post("/createDate", validateDate, async (req, res) => {
+    try {
+      let newDate = req.body;
+      //  console.log('newDate ', newDate);
+      const date = await dateBazarSchema.create(newDate);
+      
+  
+      res.status(201).send({ msg: "Fecha Creada con exito!"});
+    } catch (error) {
+      console.log("error ", error);
+      res.status(400).send({ msg: "No fue posible crear la fecha", error: error });
+    }
+  });
+
 
 router.post("/register", async (req, res) => {
   const { username, email, wepPage, socialNetworks, password, role } = req.body;
@@ -242,18 +249,48 @@ router.put("/updateMarcasCurso/:id", async (req, res) => {
   }
 });
 
-router.delete("/datesBazares/:bazarId/events/:eventId", async (req, res) => {
-  const { bazarId, eventId } = req.params;
-  try {
-    // Buscar el documento y eliminar el evento
-    const result = await dateBazarSchema.findByIdAndUpdate(
-      bazarId,
-      { $pull: { events: { _id: eventId } } },
-      { new: true } // Opcional: retorna el documento actualizado
-    );
-    if (!result) {
-      return res.status(404).json({ msj: "Bazar no encontrado" });
+
+  router.put('/updateDateBazar/:id', async (req, res)=>{
+    const _id = req.params.id;
+    const {place, date, time, events } = req.body; 
+    
+    try {
+
+      const existingDate  = await dateBazarSchema.findById(_id);
+
+      if (!existingDate ) {
+        return res.status(404).send('Fecha no encontrada');
+      }
+
+      existingDate.place = place
+      existingDate.date = date
+      existingDate.time = time
+      existingDate.events = events
+
+      const updatedDate = await existingDate.save();
+
+      res.send(updatedDate);
+  
+      
+    } catch (error) {
+      res.status(500).send('Error al actualizar las marcas en la fecha deseada');
     }
+  } )
+
+
+
+  router.delete('/datesBazares/:bazarId/events/:eventId', async (req, res)=>{
+    const { bazarId, eventId } = req.params;
+    try {
+      // Buscar el documento y eliminar el evento
+      const result = await dateBazarSchema.findByIdAndUpdate(
+          bazarId,
+          { $pull: { events: { _id: eventId } } },
+          { new: true } // Opcional: retorna el documento actualizado
+      );
+      if (!result) {
+          return res.status(404).json({ msj: 'Bazar no encontrado' });
+      }
 
     res.status(200).json({ msj: "Evento eliminado", result });
   } catch (error) {
