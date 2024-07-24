@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const userSchema = require("../models/users");
-const usersBazarSchema = require("../models/bazar/bazarUsers")
-const userMarcaSchema = require("../models/marca/usersMarca")
+const usersBazarSchema = require("../models/bazar/bazarUsers");
+const userMarcaSchema = require("../models/marca/usersMarca");
 const createJWT = require("../middlewares/authentication");
 
 // router.get('/', (req, res) => {
@@ -87,11 +87,9 @@ router.get("/bazares/:bazarId", async (req, res) => {
   }
 });
 
-
 router.post("/register", async (req, res) => {
   const { username, email, role, password } = req.body;
   try {
-    
     // Verificar si el correo electrónico ya está registrado
     const existingMail = await userSchema.findOne({ email: email });
     const existingUsername = await userSchema.findOne({ username: username });
@@ -105,7 +103,6 @@ router.post("/register", async (req, res) => {
         .status(400)
         .send({ msg: "Nombre de usuario registrado, prueba con otro." });
     }
-    console.log()
     // Encriptar la contraseña
     const salt = await bcrypt.genSalt(10);
     const encryptedPassword = await bcrypt.hash(password, salt);
@@ -113,13 +110,13 @@ router.post("/register", async (req, res) => {
 
     // Crear un nuevo usuario
     const user = new userSchema({
-  
       username,
       email,
       password: encryptedPassword,
+      profilePicture:
+        "https://i.pinimg.com/564x/57/00/c0/5700c04197ee9a4372a35ef16eb78f4e.jpg",
       role,
     });
-    console.log(user)
 
     await user.save();
     res.status(200).send({ msg: "Usuario creado con éxito!" });
@@ -128,7 +125,8 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.post("/login", async (req, res) => { //este enPoint es usado por los 3 tipos de users
+router.post("/login", async (req, res) => {
+  //este enPoint es usado por los 3 tipos de users
   try {
     const { email, password } = req.body;
 

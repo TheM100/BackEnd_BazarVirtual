@@ -20,7 +20,7 @@ router.get("/", async (req, res) => {
 router.get("/bazar/:bazarId", async (req, res) => {
   const { bazarId } = req.params;
 
-  const eventsFromBazarId = await eventsSchema.find({ bazarId: bazarId });
+  const eventsFromBazarId = await dateBazarSchema.find({ bazarId: bazarId });
 
   if (!eventsFromBazarId || eventsFromBazarId.length === 0) {
     return res.status(404).send({ msg: "No hay eventos de este bazar" });

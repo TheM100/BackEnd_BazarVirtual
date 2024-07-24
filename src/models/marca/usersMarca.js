@@ -1,9 +1,10 @@
 const mongooselib = require("mongoose");
+const socialNetworkLink = require("../bazar/eschemaAux/socialNetworks");
 
 const userMarcaEsquema = new mongooselib.Schema({
   profilePicture: {
     type: String,
-    default: '',
+    default: "",
   },
   username: {
     type: String,
@@ -29,14 +30,21 @@ const userMarcaEsquema = new mongooselib.Schema({
   },
   description: {
     type: String,
-    default: '',
+    default: "",
   },
   slogan: {
     type: String,
-    default: '',
+    default: "",
+  },
+  socialNetworks: {
+    type: [socialNetworkLink],
   },
 });
 
-const userMarcaSchema = mongooselib.model("UsersMarca", userMarcaEsquema, "usersMarca"); //primer parametro:nombre_modelo, segundo parametro: nombre_esquema_a_utilizar, tercer parametro: nombre-de-coleccion-en-la-BD
+const userMarcaSchema = mongooselib.model(
+  "UsersMarca",
+  userMarcaEsquema,
+  "usersMarca"
+); //primer parametro:nombre_modelo, segundo parametro: nombre_esquema_a_utilizar, tercer parametro: nombre-de-coleccion-en-la-BD
 
 module.exports = userMarcaSchema;
