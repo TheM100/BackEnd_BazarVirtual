@@ -1,6 +1,48 @@
+const multer = require("multer");
+const uploadToS3 = require("../controllers/upload.js");
+
 const express = require("express");
 const router = express.Router();
 const productsSchema = require("../models/products");
+
+const upload = multer({ dest: "uploads/" });
+
+router.post("/newProduct", upload.single("image"), async (req, res) => {
+  const { createdBy, price, title, description, category, productImage } =
+    req.body;
+  const data = req.body;
+  console.log(createdBy);
+  console.log(req.body);
+  const filePath = req.file.path;
+  const fileName = req.file.originalname;
+  try {
+    const result = await uploadToS3(filePath, fileName);
+    if (result.success) {
+      const newProduct = new productsSchema({
+        createdBy: data.createdBy,
+        price: data.price,
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        productImage: result.location,
+      });
+      console.log(newProduct);
+      await newProduct.save();
+      res.status(200).send({ success: true, product: newProduct });
+    } else {
+      res
+        .status(500)
+        .send({ success: false, message: "Error al subir el archivo a S3" });
+    }
+  } catch (error) {
+    console.error("Error al procesar la solicitud:", error);
+    res.status(500).send({
+      success: false,
+      message: "Error interno del servidor",
+      error,
+    });
+  }
+});
 // const createJWT = require("../middlewares/authorization");
 
 router.get("/", async (req, res) => {
@@ -70,20 +112,19 @@ router.get("/brand/:brandId", async (req, res) => {
   }
 });
 
-router.post("/newProduct", async (req, res) => {
-  try {
-    const newProduct = req.body;
-    const product = await productsSchema.create(newProduct);
+// router.post("/newProduct", async (req, res) => {
+//   try {
+//     const newProduct = req.body;
+//     const product = await productsSchema.create(newProduct);
 
-    res.status(201).send({ msg: "Nuevo Producto creado con exito!" });
-  } catch (error) {
-    console.log("error ", error);
-    res
-      .status(400)
-      .send({ msg: "No fue posible crear el producto", error: error });
-  }
-});
-module.exports = router;
+//     res.status(201).send({ msg: "Nuevo Producto creado con exito!" });
+//   } catch (error) {
+//     console.log("error ", error);
+//     res
+//       .status(400)
+//       .send({ msg: "No fue posible crear el producto", error: error });
+//   }
+// });
 
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
@@ -103,3 +144,5 @@ router.delete("/:id", async (req, res) => {
     res.status(500).send({ msg: "Error al eliminar el producto" });
   }
 });
+
+module.exports = router;
