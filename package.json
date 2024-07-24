@@ -11,11 +11,7 @@
   "author": "BazarTeam",
   "license": "ISC",
   "dependencies": {
-<<<<<<< HEAD
-    "aws-sdk": "^2.1662.0",
-=======
     "aws-sdk": "^2.1663.0",
->>>>>>> f807cc13a8a42aab7de3ddb0e916efeb5fb47e82
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -25,11 +21,7 @@
     "mongoose": "^8.4.3",
     "multer": "^1.4.5-lts.1",
     "nodemon": "^3.1.4",
-<<<<<<< HEAD
-    "path": "^0.12.7"
-=======
     "path": "^0.12.7",
     "transloadit": "^3.0.2"
->>>>>>> f807cc13a8a42aab7de3ddb0e916efeb5fb47e82
   }
 }
