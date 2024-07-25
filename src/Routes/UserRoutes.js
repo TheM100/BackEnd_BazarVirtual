@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
-const userSchema = require("../models/users");
+const userSchema = require("../models/clients/users");
 const usersBazarSchema = require("../models/bazar/bazarUsers");
 const userMarcaSchema = require("../models/marca/usersMarca");
 const createJWT = require("../middlewares/authentication");
@@ -88,7 +88,16 @@ router.get("/bazares/:bazarId", async (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-  const { username, email, role, password } = req.body;
+  console.log(req.body);
+  const {
+    username,
+    email,
+    role,
+    password,
+    shoppingCart,
+    wishList,
+    purchaseHistory,
+  } = req.body;
   try {
     // Verificar si el correo electrónico ya está registrado
     const existingMail = await userSchema.findOne({ email: email });
@@ -110,12 +119,15 @@ router.post("/register", async (req, res) => {
 
     // Crear un nuevo usuario
     const user = new userSchema({
-      username,
-      email,
+      username: username,
+      email: email,
       password: encryptedPassword,
       profilePicture:
         "https://i.pinimg.com/564x/57/00/c0/5700c04197ee9a4372a35ef16eb78f4e.jpg",
-      role,
+      role: role || "cliente",
+      shoppingCart: shoppingCart || [],
+      wishList: wishList || [],
+      purchaseHistory: purchaseHistory || [],
     });
 
     await user.save();
