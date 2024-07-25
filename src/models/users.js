@@ -1,10 +1,6 @@
 const mongooselib = require("mongoose");
 
 const userEsquema = new mongooselib.Schema({
-  // profilePicture: {
-  //   type: String,
-  //   default: '',
-  // },
   username: {
     type: String,
     required: true,
@@ -31,6 +27,45 @@ const userEsquema = new mongooselib.Schema({
     type: String,
     default: "",
   },
+  shoppingCart: [
+    {
+      productId: {
+        type: mongooselib.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+      quantity: {
+        type: Number,
+        default: 1,
+      },
+    },
+  ],
+  wishList: [
+    {
+      productId: {
+        type: mongooselib.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+      quantity: {
+        type: Number,
+        default: 1,
+      },
+    },
+  ],
+  purchaseHistory: [
+    {
+      productId: {
+        type: mongooselib.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+      quantity: {
+        type: Number,
+      },
+      purchaseDate: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
 });
 
 // const userSchema = mongooselib.model("Users", userEsquema, "users"); //primer parametro:nombre_modelo, segundo parametro: nombre_esquema_a_utilizar, tercer parametro: nombre-de-coleccion-en-la-BD
