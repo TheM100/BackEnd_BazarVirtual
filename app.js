@@ -4,22 +4,17 @@ const app = express();
 const cors = require("cors");
 const PORT = 3001;
 
-
-
 const userRoutes = require("./src/Routes/UserRoutes"); //importando las routes de users
 const productRoutes = require("./src/Routes/ProductsRoutes");
 const eventsRoutes = require("./src/Routes/EventsRoutes");
-const bazarRoutes = require('./src/Routes/bazarRoutes')
-const marcaRoutes = require("./src/Routes/marcaRoutes")
+const bazarRoutes = require("./src/Routes/bazarRoutes");
+const marcaRoutes = require("./src/Routes/marcaRoutes");
 const { connect } = require("./src/dataBase/ConectionDB");
 
-
 connect();
-app.use(cors({ origin: "http://localhost:3000" }));
-
+app.use(cors({ origin: "https://bazarvirtual.vercel.app/" }));
 
 app.use(express.json());
-
 
 app.get("/", (req, res) => {
   //primer endPoint que salta
