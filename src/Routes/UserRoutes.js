@@ -185,9 +185,7 @@ router.post("/login", async (req, res) => {
 
 router.put("/shoppingCart/:id", async (req, res) => {
   const userId = req.params.id;
-  console.log(userId);
   const { shoppingCart } = req.body;
-  console.log(shoppingCart);
 
   // Validar el formato del shoppingCart
   if (!Array.isArray(shoppingCart)) {
@@ -234,7 +232,7 @@ router.put("/wishList/:id", async (req, res) => {
     const updatedUser = await userSchema.findByIdAndUpdate(
       userId,
       { wishList },
-      { new: true, runValidators: true } // new: true para devolver el usuario actualizado, runValidators: true para validar los datos
+      { new: true, runValidators: true }
     );
 
     // Verificar si el usuario existe
@@ -285,6 +283,25 @@ router.get("/shoppingCart/:id", async (req, res) => {
     res.status(200).json({ shoppingCart: user.shoppingCart });
   } catch (error) {
     console.error("Error al obtener el shopping cart:", error);
+    res.status(500).json({ msg: "Error en el servidor", error });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Buscar al usuario por ID
+    const userToDelete = await userSchema.findOneAndDelete(userId);
+
+    if (!user) {
+      return res.status(404).json({ msg: "Usuario no encontrado" });
+    }
+
+    // Devolver el shopping cart del usuario
+    res.status(200).json({ shoppingCart: userToDelete.shoppingCart });
+  } catch (error) {
+    console.error("Error al borrar el shopping cart:", error);
     res.status(500).json({ msg: "Error en el servidor", error });
   }
 });
