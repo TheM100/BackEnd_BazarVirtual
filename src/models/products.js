@@ -1,8 +1,10 @@
 const mongooselib = require("mongoose");
 
 const productsEsquema = new mongooselib.Schema({
-  username: {
+  createdBy: {
     type: String,
+    type: mongooselib.Schema.Types.ObjectId,
+    ref: "UsersMarca",
     required: true,
   },
   title: {
@@ -21,8 +23,16 @@ const productsEsquema = new mongooselib.Schema({
     type: String,
     required: true,
   },
+  category: {
+    type: String,
+    required: true,
+  },
 });
 
-const userSchema = mongooselib.model("Products", userEsquema, "products"); //primer parametro:nombre_modelo, segundo parametro: nombre_esquema_a_utilizar, tercer parametro: nombre-de-coleccion-en-la-BD
+const productsSchema = mongooselib.model(
+  "Products",
+  productsEsquema,
+  "products"
+); //primer parametro:nombre_modelo, segundo parametro: nombre_esquema_a_utilizar, tercer parametro: nombre-de-coleccion-en-la-BD
 
-module.exports = userSchema;
+module.exports = productsSchema;
