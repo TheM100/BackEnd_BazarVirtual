@@ -27,6 +27,20 @@ router.get("/", async (req, res) => {
       .send({ msg: "No se pudo extraer a los usuarios", error: error });
   }
 });
+router.get("/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const userById = await userSchema.findOne({ _id: id });
+    res.send({
+      msg: "Único usuario con id de la coleccion Users",
+      data: userById,
+    });
+  } catch (error) {
+    res
+      .status(400)
+      .send({ msg: "No se pudo extraer a los usuarios", error: error });
+  }
+});
 
 router.get("/marcas", async (req, res) => {
   try {
@@ -234,6 +248,44 @@ router.put("/wishList/:id", async (req, res) => {
   } catch (error) {
     console.error("Error al actualizar el wishList:", error);
     res.status(500).send({ msg: "Error en el servidor", error });
+  }
+});
+
+router.get("/wishList/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Buscar al usuario por ID
+    const user = await userSchema.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ msg: "Usuario no encontrado" });
+    }
+
+    // Devolver la wish list del usuario
+    res.status(200).json({ wishList: user.wishList });
+  } catch (error) {
+    console.error("Error al obtener la wish list:", error);
+    res.status(500).json({ msg: "Error en el servidor", error });
+  }
+});
+
+router.get("/shoppingCart/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Buscar al usuario por ID
+    const user = await userSchema.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ msg: "Usuario no encontrado" });
+    }
+
+    // Devolver el shopping cart del usuario
+    res.status(200).json({ shoppingCart: user.shoppingCart });
+  } catch (error) {
+    console.error("Error al obtener el shopping cart:", error);
+    res.status(500).json({ msg: "Error en el servidor", error });
   }
 });
 
