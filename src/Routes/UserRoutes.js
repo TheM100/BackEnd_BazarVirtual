@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
-const userSchema = require("../models/users");
+const userSchema = require("../models/clients/users");
 const usersBazarSchema = require("../models/bazar/bazarUsers");
 const userMarcaSchema = require("../models/marca/usersMarca");
 const createJWT = require("../middlewares/authentication");
@@ -20,6 +20,20 @@ router.get("/", async (req, res) => {
     res.send({
       msg: "Todos los usuarios de la coleccion Users",
       data: AllUsers,
+    });
+  } catch (error) {
+    res
+      .status(400)
+      .send({ msg: "No se pudo extraer a los usuarios", error: error });
+  }
+});
+router.get("/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const userById = await userSchema.findOne({ _id: id });
+    res.send({
+      msg: "Único usuario con id de la coleccion Users",
+      data: userById,
     });
   } catch (error) {
     res
@@ -88,7 +102,15 @@ router.get("/bazares/:bazarId", async (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-  const { username, email, role, password } = req.body;
+  const {
+    username,
+    email,
+    role,
+    password,
+    shoppingCart,
+    wishList,
+    purchaseHistory,
+  } = req.body;
   try {
     // Verificar si el correo electrónico ya está registrado
     const existingMail = await userSchema.findOne({ email: email });
@@ -110,12 +132,15 @@ router.post("/register", async (req, res) => {
 
     // Crear un nuevo usuario
     const user = new userSchema({
-      username,
-      email,
+      username: username,
+      email: email,
       password: encryptedPassword,
       profilePicture:
         "https://i.pinimg.com/564x/57/00/c0/5700c04197ee9a4372a35ef16eb78f4e.jpg",
-      role,
+      role: role || "cliente",
+      shoppingCart: shoppingCart || [],
+      wishList: wishList || [],
+      purchaseHistory: purchaseHistory || [],
     });
 
     await user.save();
@@ -155,6 +180,129 @@ router.post("/login", async (req, res) => {
     }
   } catch (error) {
     res.status(400).send({ msg: "Invalid login", Error: error });
+  }
+});
+
+router.put("/shoppingCart/:id", async (req, res) => {
+  const userId = req.params.id;
+  const { shoppingCart } = req.body;
+
+  // Validar el formato del shoppingCart
+  if (!Array.isArray(shoppingCart)) {
+    return res
+      .status(400)
+      .send({ msg: "El formato del shoppingCart no es válido." });
+  }
+
+  try {
+    // Encontrar y actualizar el usuario
+    const updatedUser = await userSchema.findByIdAndUpdate(
+      userId,
+      { shoppingCart },
+      { new: true, runValidators: true }
+    );
+
+    // Verificar si el usuario existe
+    if (!updatedUser) {
+      return res.status(404).send({ msg: "Usuario no encontrado." });
+    }
+
+    res
+      .status(200)
+      .send({ msg: "ShoppingCart actualizado con éxito.", user: updatedUser });
+  } catch (error) {
+    console.error("Error al actualizar el shoppingCart:", error);
+    res.status(500).send({ msg: "Error en el servidor", error });
+  }
+});
+
+router.put("/wishList/:id", async (req, res) => {
+  const userId = req.params.id; // ID del usuario para actualizar
+  const { wishList } = req.body; // Datos del wishList a actualizar
+
+  // Validar el formato del wishList
+  if (!Array.isArray(wishList)) {
+    return res
+      .status(400)
+      .send({ msg: "El formato del wishList no es válido." });
+  }
+
+  try {
+    // Encontrar y actualizar el usuario
+    const updatedUser = await userSchema.findByIdAndUpdate(
+      userId,
+      { wishList },
+      { new: true, runValidators: true }
+    );
+
+    // Verificar si el usuario existe
+    if (!updatedUser) {
+      return res.status(404).send({ msg: "Usuario no encontrado." });
+    }
+
+    res
+      .status(200)
+      .send({ msg: "wishList actualizado con éxito.", user: updatedUser });
+  } catch (error) {
+    console.error("Error al actualizar el wishList:", error);
+    res.status(500).send({ msg: "Error en el servidor", error });
+  }
+});
+
+router.get("/wishList/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Buscar al usuario por ID
+    const user = await userSchema.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ msg: "Usuario no encontrado" });
+    }
+
+    // Devolver la wish list del usuario
+    res.status(200).json({ wishList: user.wishList });
+  } catch (error) {
+    console.error("Error al obtener la wish list:", error);
+    res.status(500).json({ msg: "Error en el servidor", error });
+  }
+});
+
+router.get("/shoppingCart/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Buscar al usuario por ID
+    const user = await userSchema.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ msg: "Usuario no encontrado" });
+    }
+
+    // Devolver el shopping cart del usuario
+    res.status(200).json({ shoppingCart: user.shoppingCart });
+  } catch (error) {
+    console.error("Error al obtener el shopping cart:", error);
+    res.status(500).json({ msg: "Error en el servidor", error });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Buscar al usuario por ID
+    const userToDelete = await userSchema.findOneAndDelete(userId);
+
+    if (!user) {
+      return res.status(404).json({ msg: "Usuario no encontrado" });
+    }
+
+    // Devolver el shopping cart del usuario
+    res.status(200).json({ shoppingCart: userToDelete.shoppingCart });
+  } catch (error) {
+    console.error("Error al borrar el shopping cart:", error);
+    res.status(500).json({ msg: "Error en el servidor", error });
   }
 });
 

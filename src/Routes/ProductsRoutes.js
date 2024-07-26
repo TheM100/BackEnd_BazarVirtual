@@ -1,7 +1,48 @@
+const multer = require("multer");
+const uploadToS3 = require("../controllers/upload.js");
+
 const express = require("express");
 const router = express.Router();
 const productsSchema = require("../models/products");
-// const createJWT = require("../middlewares/authorization");
+
+const upload = multer({ dest: "uploads/" });
+
+// router.post("/newProduct", upload.single("image"), async (req, res) => {
+//   const { createdBy, price, title, description, category, productImage } =
+//     req.body;
+//   const data = req.body;
+//   console.log(createdBy);
+//   console.log(req.body);
+//   const filePath = req.file.path;
+//   const fileName = req.file.originalname;
+//   try {
+//     const result = await uploadToS3(filePath, fileName);
+//     if (result.success) {
+//       const newProduct = new productsSchema({
+//         createdBy: data.createdBy,
+//         price: data.price,
+//         title: data.title,
+//         description: data.description,
+//         category: data.category,
+//         productImage: result.location,
+//       });
+//       console.log(newProduct);
+//       await newProduct.save();
+//       res.status(200).send({ success: true, product: newProduct });
+//     } else {
+//       res
+//         .status(500)
+//         .send({ success: false, message: "Error al subir el archivo a S3" });
+//     }
+//   } catch (error) {
+//     console.error("Error al procesar la solicitud:", error);
+//     res.status(500).send({
+//       success: false,
+//       message: "Error interno del servidor",
+//       error,
+//     });
+//   }
+// });
 
 router.get("/", async (req, res) => {
   try {
@@ -25,8 +66,7 @@ router.get("/:id", async (req, res) => {
     .populate({
       //uso de populate para poblar el campo createdBy con id del bazar creador y profile picture
       path: "createdBy",
-      select: "profilePicture", // Selecciona solo la imagen de perfil del usuario
-      select: "username",
+      select: "profilePicture username", // Selecciona solo la imagen de perfil del usuario
     })
     .exec();
   if (!productFromId) {
@@ -57,6 +97,25 @@ router.put("/:id", async (req, res) => {
     res.status(500).send("Error al actualizar el producto");
   }
 });
+// router.put("/:id", async (req, res) => {
+//   const { id } = req.params;
+//   const { productImage, title, price, description, category } = req.body;
+//   try {
+//     const productFromId = await productsSchema.findById(id);
+//     if (!productFromId) {
+//       return res.status(404).send({ msg: "Product not found" });
+//     }
+//     if (title) productFromId.title = title;
+//     productFromId.productImage = productImage;
+//     productFromId.price = price;
+//     productFromId.description = description;
+//     productFromId.category = category;
+//     await productFromId.save();
+//     res.send(productFromId);
+//   } catch (error) {
+//     res.status(500).send("Error al actualizar el producto");
+//   }
+// });
 
 router.get("/brand/:brandId", async (req, res) => {
   const { brandId } = req.params;
@@ -83,7 +142,6 @@ router.post("/newProduct", async (req, res) => {
       .send({ msg: "No fue posible crear el producto", error: error });
   }
 });
-module.exports = router;
 
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
@@ -103,3 +161,5 @@ router.delete("/:id", async (req, res) => {
     res.status(500).send({ msg: "Error al eliminar el producto" });
   }
 });
+
+module.exports = router;
