@@ -10,6 +10,11 @@ const purchaseHistoryEsquema = new mongooselib.Schema({
     default: Date.now,
     required: true,
   },
+  productId: {
+    type: mongooselib.Schema.Types.ObjectId,
+    ref: "Product",
+    required: true,
+  },
 });
 
 module.exports = purchaseHistoryEsquema;
