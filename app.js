@@ -20,6 +20,7 @@ app.use(cors({ origin: "http://localhost:3000" }));
 
 app.use(express.json());
 
+
 app.get("/", (req, res) => {
   //primer endPoint que salta
   res.send({ msg: "This is Home compa" });

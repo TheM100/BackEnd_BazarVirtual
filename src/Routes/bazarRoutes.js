@@ -1,10 +1,31 @@
 const express = require("express");
 const router = express.Router();
+const { v4: uuidv4 } = require('uuid');
+const multer = require('multer');
+const AWS = require('aws-sdk');
 const dateBazarSchema = require("../models/bazar/newDateBazar");
 const validateDate = require("../middlewares/bazarMiddle");
 const bcrypt = require("bcrypt");
 const usersBazarSchema = require("../models/bazar/bazarUsers");
 const createJWT = require("../middlewares/authentication");
+
+//subir imagen:
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+
+
+AWS.config.update({
+  accessKeyId: process.env.ACCESS_KEY_AWS,
+  secretAccessKey: process.env.SECRET_ACCES_KEY_AWS,
+  region: process.env.REGION_AWS
+});
+
+const s3 = new AWS.S3();
+
+
+//-------------------
 
 router.get("/", async (req, res) => {
   try {
@@ -207,27 +228,43 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.put("/updateProfile/:id", async (req, res) => {
+
+router.put("/updateProfile/:id", upload.single('imagen'), async (req, res) => {
   const _id = req.params.id;
-  const { username, wepPage, socialNetworks } = req.body; //agregar el perfilPicture
+  const { username, wepPage, socialNetworks } = req.body;
+  const file = req.file;
+
   try {
+
     const user = await usersBazarSchema.findById(_id);
 
     if (!user) {
       return res.status(404).send("Usuario no encontrado");
     }
+    if (file) {
+      const s3Params = {
+        Bucket: process.env.BUCKET_NAME,
+        Key: `profilePictures/${uuidv4()}_${file.originalname}`, // Genera un nombre de archivo único
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      };
 
-    if (username) user.username = username;
+      const data = await s3.upload(s3Params).promise();
+      user.profilePicture = data.Location; // Actualiza la imagen de perfil solo si se carga una nueva
+    }
+
+    user.username = username;
     user.wepPage = wepPage;
     user.socialNetworks = socialNetworks;
 
     await user.save();
-
-    res.send(user);
+   res.send(user);
   } catch (error) {
-    res.status(500).send("Error al actualizar el usuario");
+    console.error(error);
+    res.status(500).send("Error al actualizar el perfil del usuario");
   }
 });
+
 
 router.put("/updateMarcasCurso/:id", async (req, res) => {
   const _id = req.params.id;
@@ -298,5 +335,16 @@ router.put("/updateMarcasCurso/:id", async (req, res) => {
     res.status(500).json({ msj: "Error al eliminar el evento", error });
   }
 });
+
+
+
+
+
+
+
+
+
+
+
 
 module.exports = router;
