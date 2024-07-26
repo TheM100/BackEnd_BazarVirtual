@@ -88,7 +88,6 @@ router.get("/bazares/:bazarId", async (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-  console.log(req.body);
   const {
     username,
     email,
@@ -167,6 +166,74 @@ router.post("/login", async (req, res) => {
     }
   } catch (error) {
     res.status(400).send({ msg: "Invalid login", Error: error });
+  }
+});
+
+router.put("/shoppingCart/:id", async (req, res) => {
+  const userId = req.params.id;
+  console.log(userId);
+  const { shoppingCart } = req.body;
+  console.log(shoppingCart);
+
+  // Validar el formato del shoppingCart
+  if (!Array.isArray(shoppingCart)) {
+    return res
+      .status(400)
+      .send({ msg: "El formato del shoppingCart no es válido." });
+  }
+
+  try {
+    // Encontrar y actualizar el usuario
+    const updatedUser = await userSchema.findByIdAndUpdate(
+      userId,
+      { shoppingCart },
+      { new: true, runValidators: true }
+    );
+
+    // Verificar si el usuario existe
+    if (!updatedUser) {
+      return res.status(404).send({ msg: "Usuario no encontrado." });
+    }
+
+    res
+      .status(200)
+      .send({ msg: "ShoppingCart actualizado con éxito.", user: updatedUser });
+  } catch (error) {
+    console.error("Error al actualizar el shoppingCart:", error);
+    res.status(500).send({ msg: "Error en el servidor", error });
+  }
+});
+
+router.put("/wishList/:id", async (req, res) => {
+  const userId = req.params.id; // ID del usuario para actualizar
+  const { wishList } = req.body; // Datos del wishList a actualizar
+
+  // Validar el formato del wishList
+  if (!Array.isArray(wishList)) {
+    return res
+      .status(400)
+      .send({ msg: "El formato del wishList no es válido." });
+  }
+
+  try {
+    // Encontrar y actualizar el usuario
+    const updatedUser = await userSchema.findByIdAndUpdate(
+      userId,
+      { wishList },
+      { new: true, runValidators: true } // new: true para devolver el usuario actualizado, runValidators: true para validar los datos
+    );
+
+    // Verificar si el usuario existe
+    if (!updatedUser) {
+      return res.status(404).send({ msg: "Usuario no encontrado." });
+    }
+
+    res
+      .status(200)
+      .send({ msg: "wishList actualizado con éxito.", user: updatedUser });
+  } catch (error) {
+    console.error("Error al actualizar el wishList:", error);
+    res.status(500).send({ msg: "Error en el servidor", error });
   }
 });
 
