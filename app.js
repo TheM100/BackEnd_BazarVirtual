@@ -11,6 +11,7 @@ const bazarRoutes = require("./src/Routes/bazarRoutes");
 const marcaRoutes = require("./src/Routes/marcaRoutes");
 const { connect } = require("./src/dataBase/ConectionDB");
 
+//Comentario test
 connect();
 app.use(cors({ origin: "http://localhost:3000" }));
 
