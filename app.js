@@ -12,7 +12,7 @@ const marcaRoutes = require("./src/Routes/marcaRoutes");
 const { connect } = require("./src/dataBase/ConectionDB");
 
 connect();
-app.use(cors({ origin: "https://bazarvirtual.vercel.app/" }));
+app.use(cors({ origin: "http://localhost:3000" }));
 
 app.use(express.json());
 
