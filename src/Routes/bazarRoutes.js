@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { v4: uuidv4 } = require('uuid');
-const multer = require('multer');
-const AWS = require('aws-sdk');
+const { v4: uuidv4 } = require("uuid");
+const multer = require("multer");
+const AWS = require("aws-sdk");
 const dateBazarSchema = require("../models/bazar/newDateBazar");
 const validateDate = require("../middlewares/bazarMiddle");
 const bcrypt = require("bcrypt");
@@ -14,16 +14,13 @@ const createJWT = require("../middlewares/authentication");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-
-
 AWS.config.update({
   accessKeyId: process.env.ACCESS_KEY_AWS,
   secretAccessKey: process.env.SECRET_ACCES_KEY_AWS,
-  region: process.env.REGION_AWS
+  region: process.env.REGION_AWS,
 });
 
 const s3 = new AWS.S3();
-
 
 //-------------------
 
@@ -91,92 +88,86 @@ router.get("/bazarDates", async (req, res) => {
       })
       .exec();
 
-      res.send({
-        msg: "Todas las fechas disponibles",
-        data: allDatesBazares,
+    res.send({
+      msg: "Todas las fechas disponibles",
+      data: allDatesBazares,
+    });
+  } catch (error) {
+    res.status(400).send({
+      msg: "No fue posible extraer las fechas de los bazares:)",
+      error: error,
+    });
+  }
+});
+
+router.get("/dateById/:dateId", async (req, res) => {
+  try {
+    const idDate = req.params.dateId;
+
+    const date = await dateBazarSchema.findById(idDate);
+    // console.log(date)
+    if (date) {
+      res.status(200).json({
+        success: true,
+        message: "Dates con ese id:",
+        data: date,
       });
-    } catch (error) {
-      res.status(400).send({ msg: "No fue posible extraer las fechas de los bazares:)", error: error }); 
-    }
-  });
-
-
-  
-
-  router.get("/dateById/:dateId", async (req,res)=>{
-    try {
-      const idDate = req.params.dateId;
-      
-      const date = await dateBazarSchema.findById(idDate);
-      // console.log(date)
-      if(date){
-        res.status(200).json({
-          success: true,
-          message: 'Dates con ese id:',
-          data: date
-        });
-      }else{
-        res.status(404).json({
-          success: false,
-          message: 'No se encontro alguna fecha con ese ID'
-        });
-      }
-      
-    } catch (error) {
-      res.status(500).json({
+    } else {
+      res.status(404).json({
         success: false,
-        message: 'Error interno del servidor',
-        error: error.message
+        message: "No se encontro alguna fecha con ese ID",
       });
     }
-  });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error interno del servidor",
+      error: error.message,
+    });
+  }
+});
 
+router.get("/datesUser/:_idUser", async (req, res) => {
+  try {
+    const idUser = req.params._idUser;
 
-  router.get("/datesUser/:_idUser", async (req,res)=>{
-    try {
-      const idUser = req.params._idUser;
-      
-      const dates = await dateBazarSchema.find({ createdBy: `${idUser}`} );
-      // console.log(dates)
-      if(dates){
-        res.status(200).json({
-          success: true,
-          message: 'Dates de tu bazar:',
-          data: dates
-        });
-      }else{
-        res.status(404).json({
-          success: false,
-          message: 'no se encontraron fechas de este bazar'
-        });
-      }
-      
-    } catch (error) {
-      res.status(500).json({
+    const dates = await dateBazarSchema.find({ createdBy: `${idUser}` });
+    // console.log(dates)
+    if (dates) {
+      res.status(200).json({
+        success: true,
+        message: "Dates de tu bazar:",
+        data: dates,
+      });
+    } else {
+      res.status(404).json({
         success: false,
-        message: 'Error interno del servidor',
-        error: error.message
+        message: "no se encontraron fechas de este bazar",
       });
     }
-  });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error interno del servidor",
+      error: error.message,
+    });
+  }
+});
 
-  
+router.post("/createDate", validateDate, async (req, res) => {
+  try {
+    let newDate = req.body;
+    //  console.log('newDate ', newDate);
+    const date = await dateBazarSchema.create(newDate);
 
-
-  router.post("/createDate", validateDate, async (req, res) => {
-    try {
-      let newDate = req.body;
-      //  console.log('newDate ', newDate);
-      const date = await dateBazarSchema.create(newDate);
-      
-  
-      res.status(201).send({ msg: "Fecha Creada con exito!"});
-    } catch (error) {
-      console.log("error ", error);
-      res.status(400).send({ msg: "No fue posible crear la fecha", error: error });
-    }
-  });
-
+    res.status(201).send({ msg: "Fecha Creada con exito!" });
+  } catch (error) {
+    console.log("error ", error);
+    res
+      .status(400)
+      .send({ msg: "No fue posible crear la fecha", error: error });
+  }
+});
 
 router.post("/register", async (req, res) => {
   const { username, email, wepPage, socialNetworks, password, role } = req.body;
@@ -228,14 +219,12 @@ router.post("/register", async (req, res) => {
   }
 });
 
-
-router.put("/updateProfile/:id", upload.single('imagen'), async (req, res) => {
+router.put("/updateProfile/:id", upload.single("imagen"), async (req, res) => {
   const _id = req.params.id;
   const { username, wepPage, socialNetworks } = req.body;
   const file = req.file;
 
   try {
-
     const user = await usersBazarSchema.findById(_id);
 
     if (!user) {
@@ -258,17 +247,16 @@ router.put("/updateProfile/:id", upload.single('imagen'), async (req, res) => {
     user.socialNetworks = socialNetworks;
 
     await user.save();
-   res.send(user);
+    res.send(user);
   } catch (error) {
     console.error(error);
     res.status(500).send("Error al actualizar el perfil del usuario");
   }
 });
 
-
 router.put("/updateMarcasCurso/:id", async (req, res) => {
   const _id = req.params.id;
-  const { profile, nameMarca } = req.body; //agregar el perfilPicture
+  const { brandId, profilePicture, username } = req.body; //agregar el perfilPicture
   try {
     const date = await dateBazarSchema.findById(_id);
 
@@ -276,7 +264,7 @@ router.put("/updateMarcasCurso/:id", async (req, res) => {
       return res.status(404).send("Fecha no encontrada");
     }
 
-    date.marcasCurso.push({ profile, nameMarca });
+    date.marcasCurso.push({ brandId, profilePicture, username });
 
     await date.save();
 
@@ -286,48 +274,57 @@ router.put("/updateMarcasCurso/:id", async (req, res) => {
   }
 });
 
+router.get("/getMarcasCurso/:id", async (req, res) => {
+  const _id = req.params.id;
+  try {
+    const date = await dateBazarSchema.findById(_id);
 
-  router.put('/updateDateBazar/:id', async (req, res)=>{
-    const _id = req.params.id;
-    const {place, date, time, events } = req.body; 
-    
-    try {
-
-      const existingDate  = await dateBazarSchema.findById(_id);
-
-      if (!existingDate ) {
-        return res.status(404).send('Fecha no encontrada');
-      }
-
-      existingDate.place = place
-      existingDate.date = date
-      existingDate.time = time
-      existingDate.events = events
-
-      const updatedDate = await existingDate.save();
-
-      res.send(updatedDate);
-  
-      
-    } catch (error) {
-      res.status(500).send('Error al actualizar las marcas en la fecha deseada');
+    if (!date) {
+      return res.status(404).send("Fecha no encontrada");
     }
-  } )
 
+    res.status(200).json(date);
+  } catch (error) {
+    res.status(500).send("Error al obtener las marcas de la fecha deseada");
+  }
+});
 
+router.put("/updateDateBazar/:id", async (req, res) => {
+  const _id = req.params.id;
+  const { place, date, time, events } = req.body;
 
-  router.delete('/datesBazares/:bazarId/events/:eventId', async (req, res)=>{
-    const { bazarId, eventId } = req.params;
-    try {
-      // Buscar el documento y eliminar el evento
-      const result = await dateBazarSchema.findByIdAndUpdate(
-          bazarId,
-          { $pull: { events: { _id: eventId } } },
-          { new: true } // Opcional: retorna el documento actualizado
-      );
-      if (!result) {
-          return res.status(404).json({ msj: 'Bazar no encontrado' });
-      }
+  try {
+    const existingDate = await dateBazarSchema.findById(_id);
+
+    if (!existingDate) {
+      return res.status(404).send("Fecha no encontrada");
+    }
+
+    existingDate.place = place;
+    existingDate.date = date;
+    existingDate.time = time;
+    existingDate.events = events;
+
+    const updatedDate = await existingDate.save();
+
+    res.send(updatedDate);
+  } catch (error) {
+    res.status(500).send("Error al actualizar las marcas en la fecha deseada");
+  }
+});
+
+router.delete("/datesBazares/:bazarId/events/:eventId", async (req, res) => {
+  const { bazarId, eventId } = req.params;
+  try {
+    // Buscar el documento y eliminar el evento
+    const result = await dateBazarSchema.findByIdAndUpdate(
+      bazarId,
+      { $pull: { events: { _id: eventId } } },
+      { new: true } // Opcional: retorna el documento actualizado
+    );
+    if (!result) {
+      return res.status(404).json({ msj: "Bazar no encontrado" });
+    }
 
     res.status(200).json({ msj: "Evento eliminado", result });
   } catch (error) {
@@ -335,16 +332,5 @@ router.put("/updateMarcasCurso/:id", async (req, res) => {
     res.status(500).json({ msj: "Error al eliminar el evento", error });
   }
 });
-
-
-
-
-
-
-
-
-
-
-
 
 module.exports = router;
