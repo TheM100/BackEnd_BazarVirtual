@@ -4,9 +4,8 @@ const app = express();
 const cors = require("cors");
 const PORT = 3001;
 
-const userRoutes = require("./src/Routes/UserRoutes"); //importando las routes de users
+const userRoutes = require("./src/Routes/UserRoutes");
 const productRoutes = require("./src/Routes/ProductsRoutes");
-const eventsRoutes = require("./src/Routes/EventsRoutes");
 const bazarRoutes = require("./src/Routes/bazarRoutes");
 const marcaRoutes = require("./src/Routes/marcaRoutes");
 const { connect } = require("./src/dataBase/ConectionDB");
@@ -18,13 +17,11 @@ app.use(cors({ origin: "http://localhost:3000" }));
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  //primer endPoint que salta
   res.send({ msg: "This is Home compa" });
 });
 
-app.use("/users", userRoutes); //usamos endpoints de users
-app.use("/products", productRoutes); //usamos endpoints de products
-app.use("/events", eventsRoutes); //usamos endpoints de events
+app.use("/users", userRoutes); 
+app.use("/products", productRoutes); 
 app.use("/bazar", bazarRoutes);
 app.use("/marca", marcaRoutes);
 
