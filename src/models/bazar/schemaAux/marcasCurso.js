@@ -1,22 +1,15 @@
 const mongooselib = require("mongoose");
 
 const marcasCursoSchema = new mongooselib.Schema({
-
-
-profile: {
+  profile: {
     type: String,
     required: true,
-    },
+  },
 
-nameMarca: {
+  nameMarca: {
     type: String,
     required: true,
-    },
-
-        
-  
+  },
 });
-
-
 
 module.exports = marcasCursoSchema;

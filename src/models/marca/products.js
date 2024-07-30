@@ -16,9 +16,11 @@ const productsSchema = new mongooselib.Schema({
     required: true,
   },
   price: {
-    type: String,
+    type: Number,
     required: true,
+    min: [10, "El precio debe ser al menos 10 pesos"],
   },
+
   productImage: {
     type: String,
     required: true,
@@ -29,10 +31,6 @@ const productsSchema = new mongooselib.Schema({
   },
 });
 
-const productsModel = mongooselib.model(
-  "Products",
-  productsSchema,
-  "products"
-); //primer parametro:nombre_modelo, segundo parametro: nombre_esquema_a_utilizar, tercer parametro: nombre-de-coleccion-en-la-BD
+const productsModel = mongooselib.model("Products", productsSchema, "products"); //primer parametro:nombre_modelo, segundo parametro: nombre_esquema_a_utilizar, tercer parametro: nombre-de-coleccion-en-la-BD
 
 module.exports = productsModel;
