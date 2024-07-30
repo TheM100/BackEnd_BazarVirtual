@@ -1,6 +1,6 @@
 const mongooselib = require("mongoose");
 
-const especialEventsEsquema = new mongooselib.Schema({
+const especialEventsSchema = new mongooselib.Schema({
 
 
 eventName: {
@@ -23,4 +23,4 @@ timeEvent: {
 
 
 
-module.exports = especialEventsEsquema;
+module.exports = especialEventsSchema;

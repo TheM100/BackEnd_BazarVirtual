@@ -1,6 +1,6 @@
 const mongooselib = require("mongoose");
 
-const socialNetworksEsquema = new mongooselib.Schema({
+const socialNetworksSchema = new mongooselib.Schema({
 
     platform: {
         type: String,
@@ -19,4 +19,4 @@ const socialNetworksEsquema = new mongooselib.Schema({
 
 
 
-module.exports = socialNetworksEsquema;
+module.exports = socialNetworksSchema;

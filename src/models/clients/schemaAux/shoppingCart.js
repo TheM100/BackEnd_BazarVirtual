@@ -1,13 +1,8 @@
 const mongooselib = require("mongoose");
 
-const purchaseHistoryEsquema = new mongooselib.Schema({
+const shoppingCartSchema = new mongooselib.Schema({
   quantity: {
     type: Number,
-    required: true,
-  },
-  purchaseDate: {
-    type: Date,
-    default: Date.now,
     required: true,
   },
   productId: {
@@ -17,4 +12,4 @@ const purchaseHistoryEsquema = new mongooselib.Schema({
   },
 });
 
-module.exports = purchaseHistoryEsquema;
+module.exports = shoppingCartSchema;

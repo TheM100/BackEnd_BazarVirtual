@@ -1,6 +1,6 @@
 const mongooselib = require("mongoose");
 
-const productsEsquema = new mongooselib.Schema({
+const productsSchema = new mongooselib.Schema({
   createdBy: {
     type: String,
     type: mongooselib.Schema.Types.ObjectId,
@@ -29,10 +29,10 @@ const productsEsquema = new mongooselib.Schema({
   },
 });
 
-const productsSchema = mongooselib.model(
+const productsModel = mongooselib.model(
   "Products",
-  productsEsquema,
+  productsSchema,
   "products"
 ); //primer parametro:nombre_modelo, segundo parametro: nombre_esquema_a_utilizar, tercer parametro: nombre-de-coleccion-en-la-BD
 
-module.exports = productsSchema;
+module.exports = productsModel;

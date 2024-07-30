@@ -1,8 +1,8 @@
 const mongooselib = require("mongoose");
-const socialNetworkLink = require("./eschemaAux/socialNetworks")
+const socialNetworksSchema = require("./schemaAux/socialNetworks")
 
 
-const BazarUsersEsquema = new mongooselib.Schema({
+const BazarUsersSchema = new mongooselib.Schema({
 
   username: {
     type: String,
@@ -18,12 +18,12 @@ const BazarUsersEsquema = new mongooselib.Schema({
       "ingresa un correo electronico valido, ejemplo juan@gmail.com",
     ],
   },
-  wepPage: {
+  webPage: {
     type: String, 
    
   },
   socialNetworks: {
-    type: [socialNetworkLink]
+    type: [socialNetworksSchema]
      
   },
   profilePicture: {
@@ -40,6 +40,6 @@ const BazarUsersEsquema = new mongooselib.Schema({
   },
 });
 
-const usersBazarSchema = mongooselib.model("usersBazar", BazarUsersEsquema, "usersBazares"); //primer parametro:nombre_modelo, segundo parametro: nombre_esquema_a_utilizar, tercer parametro: nombre-de-coleccion-en-la-BD
+const usersBazarModel = mongooselib.model("usersBazar", BazarUsersSchema, "usersBazares"); //primer parametro:nombre_modelo, segundo parametro: nombre_esquema_a_utilizar, tercer parametro: nombre-de-coleccion-en-la-BD
 
-module.exports = usersBazarSchema;
+module.exports = usersBazarModel;

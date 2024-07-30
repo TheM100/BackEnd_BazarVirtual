@@ -1,6 +1,6 @@
 const mongooselib = require("mongoose");
 
-const wishListEsquema = new mongooselib.Schema({
+const wishListSchema = new mongooselib.Schema({
   quantity: {
     type: Number,
     required: true,
@@ -12,4 +12,4 @@ const wishListEsquema = new mongooselib.Schema({
   },
 });
 
-module.exports = wishListEsquema;
+module.exports = wishListSchema;

@@ -1,7 +1,7 @@
 const mongooselib = require("mongoose");
-const socialNetworkLink = require("../bazar/eschemaAux/socialNetworks");
+const socialNetworkLink = require("../bazar/schemaAux/socialNetworks");
 
-const userMarcaEsquema = new mongooselib.Schema({
+const userMarcaSchema = new mongooselib.Schema({
   profilePicture: {
     type: String,
     default: "",
@@ -41,10 +41,10 @@ const userMarcaEsquema = new mongooselib.Schema({
   },
 });
 
-const userMarcaSchema = mongooselib.model(
+const userMarcaModel = mongooselib.model(
   "UsersMarca",
-  userMarcaEsquema,
+  userMarcaSchema,
   "usersMarca"
 ); //primer parametro:nombre_modelo, segundo parametro: nombre_esquema_a_utilizar, tercer parametro: nombre-de-coleccion-en-la-BD
 
-module.exports = userMarcaSchema;
+module.exports = userMarcaModel;

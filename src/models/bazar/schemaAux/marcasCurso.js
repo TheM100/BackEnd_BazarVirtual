@@ -1,6 +1,6 @@
 const mongooselib = require("mongoose");
 
-const marcasCursoEsquema = new mongooselib.Schema({
+const marcasCursoSchema = new mongooselib.Schema({
 
 
 profile: {
@@ -19,4 +19,4 @@ nameMarca: {
 
 
 
-module.exports = marcasCursoEsquema;
+module.exports = marcasCursoSchema;
