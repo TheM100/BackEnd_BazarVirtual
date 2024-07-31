@@ -14,7 +14,8 @@ const { connect } = require("./src/dataBase/ConectionDB");
 connect();
 app.use(cors({ origin: "http://localhost:3000" }));
 
-app.use(express.json());
+// app.use(express.json());
+app.use(express.json({ limit: '10mb' })); // Por ejemplo, 10 megabytes
 
 app.get("/", (req, res) => {
   res.send({ msg: "This is Home compa" });

@@ -29,7 +29,8 @@ router.post("/createDate", validateDate, createDate);
 
 router.post("/register", registerUserBazar);
 
-router.put("/updateProfile/:id", upload.single('imagen'), updateProfileBazar );
+// router.put("/updateProfile/:id", upload.single('imagen'), updateProfileBazar );
+router.put("/updateProfile/:id", updateProfileBazar );
 
 router.put("/updateMarcasCurso/:id", updateMarcasCurso );
 
