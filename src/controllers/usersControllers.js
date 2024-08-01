@@ -173,6 +173,69 @@ const updateShoppingCart = async (req, res) => {
     res.status(500).send({ msg: "Error en el servidor", error });
   }
 };
+const deleteShoppingCart = async (req, res) => {
+  const userId = req.params.id;
+  const shoppingCart = [];
+  try {
+    const updatedUser = await userModel.findByIdAndUpdate(
+      userId,
+      { shoppingCart },
+      { new: true, runValidators: true }
+    );
+    if (!updatedUser) {
+      return res.status(404).send({ msg: "Usuario no encontrado" });
+    }
+    res
+      .status(200)
+      .send({ msg: "Usuario actualizado con éxito", user: updatedUser });
+  } catch (error) {
+    console.error("Error al borrar el shoppingCart", error);
+    res.status(500).send({ msg: "Error en el servidor", error });
+  }
+};
+
+const deleteProductFromShoppingCart = async (req, res) => {
+  const userId = req.params.id;
+  const { productId } = req.body;
+
+  try {
+    const updatedUser = await userModel.findByIdAndUpdate(
+      userId,
+      { $pull: { shoppingCart: { productId: productId } } },
+      { new: true, runValidators: true }
+    );
+    if (!updatedUser) {
+      return res.status(404).send({ msg: "Usuario no encontrado" });
+    }
+    res
+      .status(200)
+      .send({ msg: "Usuario actualizado con éxito", user: updatedUser });
+  } catch (error) {
+    console.error("Error al borrar producto de shoppindList", error);
+    res.status(500).send({ msg: "Error en el servidor", error });
+  }
+};
+const deleteProductFromWishList = async (req, res) => {
+  const userId = req.params.id;
+  const { productId } = req.body;
+
+  try {
+    const updatedUser = await userModel.findByIdAndUpdate(
+      userId,
+      { $pull: { wishList: { productId: productId } } },
+      { new: true, runValidators: true }
+    );
+    if (!updatedUser) {
+      return res.status(404).send({ msg: "Usuario no encontrado" });
+    }
+    res
+      .status(200)
+      .send({ msg: "Usuario actualizado con éxito", user: updatedUser });
+  } catch (error) {
+    console.error("Error al borrar producto de wishList", error);
+    res.status(500).send({ msg: "Error en el servidor", error });
+  }
+};
 
 const updateWishList = async (req, res) => {
   const userId = req.params.id;
@@ -213,4 +276,7 @@ module.exports = {
   updateWishList,
   getWishListUser,
   getShoppingCartUser,
+  deleteShoppingCart,
+  deleteProductFromShoppingCart,
+  deleteProductFromWishList,
 };
