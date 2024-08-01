@@ -1,11 +1,18 @@
 const { v4: uuidv4 } = require('uuid');
+const mime = require('mime-types');
 const AWS = require('aws-sdk');
 const dateBazarModel = require("../models/bazar/newDateBazar");
 const bcrypt = require("bcrypt");
 const usersBazarModel = require("../models/bazar/bazarUsers")
 
 //subir imagen:
+const fs = require('fs');
+const path = require('path');
 
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
 
 
 //configuration AWS S3
@@ -208,28 +215,46 @@ const registerUserBazar = async (req, res) => {
         }
       }
 
-const updateProfileBazar = async (req, res) => {
+      const updateProfileBazar = async (req, res) => {
         const _id = req.params.id;
-        const { username, webPage, socialNetworks } = req.body;
-        const file = req.file;
+        const { username, webPage, socialNetworks, profilePicture } = req.body;
       
         try {
-      
           const user = await usersBazarModel.findById(_id);
-      
+          
           if (!user) {
             return res.status(404).send("Usuario no encontrado");
           }
-          if (file) {
+      
+          if (profilePicture) {
+            // Detectar el tipo MIME y la extensión de la imagen
+            const match = profilePicture.match(/^data:(image\/(jpeg|png|gif|bmp|tiff));base64,/);
+            if (!match) {
+              console.log("extencion no soportada")
+             return res.status(400).send({ msg: 'Tipo de imagen no soportada.' });
+            }
+      
+            const mimeType = match[1];
+            const extname = mime.extension(mimeType) || 'jpeg'; 
+      
+            // Extraer el base64 de la cadena
+            const base64Data = profilePicture.replace(/^data:image\/(jpeg|png|gif|bmp|tiff);base64,/, '');
+            const buffer = Buffer.from(base64Data, 'base64');
+      
+            // Generar el nombre del archivo con un UUID y la extensión detectada
+            const fileName = `${uuidv4()}_${Date.now()}.${extname}`;
+      
+            // Definir parámetros de S3
             const s3Params = {
               Bucket: process.env.BUCKET_NAME,
-              Key: `profilePictures/${uuidv4()}_${file.originalname}`, // Genera un nombre de archivo único
-              Body: file.buffer,
-              ContentType: file.mimetype,
+              Key: `profilePictures/${fileName}`,
+              Body: buffer,
+              ContentType: mimeType, // Usa el tipo MIME detectado
             };
       
+            // Subir archivo a S3
             const data = await s3.upload(s3Params).promise();
-            user.profilePicture = data.Location; // Actualiza la imagen de perfil solo si se carga una nueva
+            user.profilePicture = data.Location; 
           }
       
           user.username = username;
@@ -237,12 +262,14 @@ const updateProfileBazar = async (req, res) => {
           user.socialNetworks = socialNetworks;
       
           await user.save();
-         res.send(user);
+          res.status(200).send({ msg: 'Perfil actualizado satisfactoriamente.' });
+      
         } catch (error) {
           console.error(error);
-          res.status(500).send("Error al actualizar el perfil del usuario");
+          res.status(400).send("Error al actualizar el perfil del usuario");
         }
-      }
+      };
+
 
 const updateMarcasCurso = async (req, res) => {
         const _id = req.params.id;
