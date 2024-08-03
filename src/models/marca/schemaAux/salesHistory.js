@@ -5,6 +5,11 @@ const salesSchema = new mongooselib.Schema({
     type: Number,
     required: true,
   },
+  status: {
+    type: String,
+    required: true,
+    enum: ["ActiveOrders", "PaymentPending", "CompletedOrders", "AllOrders"],
+  },
   purchaseDate: {
     type: Date,
     default: Date.now,
