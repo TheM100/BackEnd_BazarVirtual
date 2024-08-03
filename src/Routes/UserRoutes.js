@@ -1,30 +1,44 @@
 const express = require("express");
 const router = express.Router();
 
+const {
+  getUsers,
+  userById,
+  registerUser,
+  generalLogin,
+  updateShoppingCart,
+  updateWishList,
+  getWishListUser,
+  getShoppingCartUser,
+  deleteShoppingCart,
+  deleteProductFromShoppingCart,
+  deleteProductFromWishList,
+  updateQuantityShoppingCart,
+} = require("../controllers/usersControllers");
 
-const{getUsers, userById, registerUser,
-      generalLogin, updateShoppingCart, updateWishList,
-      getWishListUser, getShoppingCartUser
-      } = require("../controllers/usersControllers")
+router.get("/", getUsers);
 
-router.get("/", getUsers );
+router.get("/:id", userById);
 
-router.get("/:id", userById );
+router.get("/wishList/:id", getWishListUser);
 
-router.get("/wishList/:id",  getWishListUser);
+router.get("/shoppingCart/:id", getShoppingCartUser);
 
-router.get("/shoppingCart/:id", getShoppingCartUser );
+router.put("/deleteShoppingCart/:id", deleteShoppingCart);
 
-router.post("/register", registerUser );
+router.put("/deleteShoppingCartItem/:id", deleteProductFromShoppingCart);
 
-router.post("/login", generalLogin );
+router.post("/register", registerUser);
 
-router.put("/shoppingCart/:id", updateShoppingCart );
+router.post("/login", generalLogin);
 
-router.put("/wishList/:id", updateWishList );
+router.put("/shoppingCart/:id", updateShoppingCart);
 
+router.put("/updateQuantityShoppingCart/:id", updateQuantityShoppingCart);
 
+router.put("/wishList/:id", updateWishList);
 
+router.put("/deleteWishListItem/:id", deleteProductFromWishList);
 // router.delete("/:id", async (req, res) => {
 //   try {
 //     const userId = req.params.id;

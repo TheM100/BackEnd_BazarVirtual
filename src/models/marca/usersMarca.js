@@ -1,5 +1,6 @@
 const mongooselib = require("mongoose");
 const socialNetworkLink = require("../bazar/schemaAux/socialNetworks");
+const salesHistorySchema = require("./schemaAux/salesHistory");
 
 const userMarcaSchema = new mongooselib.Schema({
   profilePicture: {
@@ -39,6 +40,7 @@ const userMarcaSchema = new mongooselib.Schema({
   socialNetworks: {
     type: [socialNetworkLink],
   },
+  salesHistory: { type: [salesHistorySchema] },
 });
 
 const userMarcaModel = mongooselib.model(
