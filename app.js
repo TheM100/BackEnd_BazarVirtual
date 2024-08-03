@@ -2,7 +2,7 @@ require("dotenv").config(); //metodo para invocar variables de desarrollo
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const PORT = 3001;
+const PORT = 3000;
 
 const userRoutes = require("./src/Routes/UserRoutes");
 const productRoutes = require("./src/Routes/ProductsRoutes");
