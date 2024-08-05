@@ -2,7 +2,26 @@ const bcrypt = require("bcrypt");
 const userModel = require("../models/clients/users");
 const usersBazarModel = require("../models/bazar/bazarUsers");
 const userMarcaModel = require("../models/marca/usersMarca");
+const { v4: uuidv4 } = require('uuid');
+const mime = require('mime-types');
+const AWS = require('aws-sdk');
 const createJWT = require("../middlewares/authentication");
+
+//subir imagen:
+const fs = require('fs');
+const path = require('path');
+
+
+//configuration AWS S3
+AWS.config.update({
+  accessKeyId: process.env.ACCESS_KEY_AWS,
+  secretAccessKey: process.env.SECRET_ACCES_KEY_AWS,
+  region: process.env.REGION_AWS
+});
+
+const s3 = new AWS.S3();
+
+//-------------------
 
 const getUsers = async (req, res) => {
   try {
@@ -267,6 +286,68 @@ const updateWishList = async (req, res) => {
   }
 };
 
+const updateProfileUser = async (req, res) =>{
+  const id = req.params.id
+   const { password, profilePicture } = req.body;
+
+   try {
+    const user = await userModel.findById(id);
+    
+    if (!user) {
+      return res.status(404).send("Usuario no encontrado");
+    }
+
+    if (profilePicture) {
+      // Detectar el tipo MIME y la extensión de la imagen
+      const match = profilePicture.match(/^data:(image\/(jpeg|png|gif|bmp|tiff));base64,/);
+      if (!match) {
+        // console.log("extencion no soportada")
+       return res.status(400).send({ msg: 'Tipo de imagen no soportada.' });
+      }
+
+      const mimeType = match[1];
+      const extname = mime.extension(mimeType) || 'jpeg'; 
+
+      // Extraer el base64 de la cadena
+      const base64Data = profilePicture.replace(/^data:image\/(jpeg|png|gif|bmp|tiff);base64,/, '');
+      const buffer = Buffer.from(base64Data, 'base64');
+
+      // Generar el nombre del archivo con un UUID y la extensión detectada
+      const fileName = `${uuidv4()}_${Date.now()}.${extname}`;
+
+      // Definir parámetros de S3
+      const s3Params = {
+        Bucket: process.env.BUCKET_NAME,
+        Key: `profilePicturesUsers/${fileName}`,
+        Body: buffer,
+        ContentType: mimeType, // Usa el tipo MIME detectado
+      };
+
+      // Subir archivo a S3
+      const data = await s3.upload(s3Params).promise();
+      user.profilePicture = data.Location; 
+    }
+
+    if(password){
+        const salt = await bcrypt.genSalt(10);
+        const encryptedPassword = await bcrypt.hash(password, salt);
+        user.password = encryptedPassword;
+    }
+
+    
+
+    await user.save();
+    res.status(200).send({ msg: 'Perfil actualizado satisfactoriamente.' });
+
+  } catch (error) {
+    console.error(error);
+    res.status(400).send("Error al actualizar el perfil del usuario");
+  }
+};
+
+
+
+
 module.exports = {
   getUsers,
   userById,
@@ -279,4 +360,6 @@ module.exports = {
   deleteShoppingCart,
   deleteProductFromShoppingCart,
   deleteProductFromWishList,
+  updateProfileUser
+  
 };

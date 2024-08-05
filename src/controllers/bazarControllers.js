@@ -9,11 +9,6 @@ const usersBazarModel = require("../models/bazar/bazarUsers")
 const fs = require('fs');
 const path = require('path');
 
-const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-}
-
 
 //configuration AWS S3
 AWS.config.update({
@@ -23,7 +18,6 @@ AWS.config.update({
 });
 
 const s3 = new AWS.S3();
-
 
 //-------------------
 
@@ -165,7 +159,7 @@ const createDate = async (req, res) => {
         }
       }
 
-const registerUserBazar = async (req, res) => {
+const registerUserBazar = async (res, req) => {
         const { username, email, webPage, socialNetworks, password, role } = req.body;
       
         try {
