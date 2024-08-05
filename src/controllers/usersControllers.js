@@ -403,6 +403,5 @@ module.exports = {
   deleteProductFromShoppingCart,
   deleteProductFromWishList,
   updateProfileUser,
-  
   updateQuantityShoppingCart,
 };
