@@ -2,7 +2,7 @@ require("dotenv").config(); //metodo para invocar variables de desarrollo
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const PORT = 3001;
+const PORT = 3000;
 
 const userRoutes = require("./src/Routes/UserRoutes");
 const productRoutes = require("./src/Routes/ProductsRoutes");
@@ -12,17 +12,30 @@ const { connect } = require("./src/dataBase/ConectionDB");
 
 //Comentario test
 connect();
-app.use(cors({ origin: "http://localhost:3000" }));
+// app.use(cors({ origin: "http://localhost:3000" }));
+const allowedOrigins = ["http://localhost:3000", "http://www.localhost:3000"];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+  })
+);
 
 // app.use(express.json());
-app.use(express.json({ limit: '10mb' })); // Por ejemplo, 10 megabytes
+app.use(express.json({ limit: "10mb" })); // Por ejemplo, 10 megabytes
 
 app.get("/", (req, res) => {
   res.send({ msg: "This is Home compa" });
 });
 
-app.use("/users", userRoutes); 
-app.use("/products", productRoutes); 
+app.use("/users", userRoutes);
+app.use("/products", productRoutes);
 app.use("/bazar", bazarRoutes);
 app.use("/marca", marcaRoutes);
 

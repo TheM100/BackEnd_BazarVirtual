@@ -15,6 +15,7 @@ const {
   deleteProductFromWishList,
   updateProfileUser,
   
+  updateQuantityShoppingCart,
 } = require("../controllers/usersControllers");
 
 router.get("/", getUsers);
@@ -34,6 +35,8 @@ router.post("/register", registerUser);
 router.post("/login", generalLogin);
 
 router.put("/shoppingCart/:id", updateShoppingCart);
+
+router.put("/updateQuantityShoppingCart/:id", updateQuantityShoppingCart);
 
 router.put("/wishList/:id", updateWishList);
 

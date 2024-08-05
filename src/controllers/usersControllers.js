@@ -192,6 +192,48 @@ const updateShoppingCart = async (req, res) => {
     res.status(500).send({ msg: "Error en el servidor", error });
   }
 };
+const updateQuantityShoppingCart = async (req, res) => {
+  const userId = req.params.id;
+  const { productId, quantity } = req.body;
+
+  if (!productId || !quantity) {
+    return res
+      .status(400)
+      .send({ msg: "El formato del shoppingCart no es válido." });
+  }
+
+  if (quantity < 1) {
+    return res.status(400).send({ msg: "La cantidad debe ser al menos 1." });
+  }
+
+  try {
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      return res.status(404).send({ msg: "Usuario no encontrado." });
+    }
+
+    const itemIndex = user.shoppingCart.findIndex(
+      (item) => item.productId.toString() === productId
+    );
+
+    if (itemIndex !== -1) {
+      user.shoppingCart[itemIndex].quantity = quantity;
+      await user.save();
+      return res
+        .status(200)
+        .send({ msg: "ShoppingCart actualizado con éxito.", user });
+    } else {
+      return res
+        .status(404)
+        .send({ msg: "Producto no encontrado en el carrito." });
+    }
+  } catch (error) {
+    console.error("Error al actualizar el shoppingCart:", error);
+    res.status(500).send({ msg: "Error en el servidor", error });
+  }
+};
+
 const deleteShoppingCart = async (req, res) => {
   const userId = req.params.id;
   const shoppingCart = [];
@@ -360,6 +402,7 @@ module.exports = {
   deleteShoppingCart,
   deleteProductFromShoppingCart,
   deleteProductFromWishList,
-  updateProfileUser
+  updateProfileUser,
   
+  updateQuantityShoppingCart,
 };
