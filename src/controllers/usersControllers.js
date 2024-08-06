@@ -3,6 +3,7 @@ const userModel = require("../models/clients/users");
 const usersBazarModel = require("../models/bazar/bazarUsers");
 const userMarcaModel = require("../models/marca/usersMarca");
 const createJWT = require("../middlewares/authentication");
+const mongooselib = require("mongoose");
 
 const getUsers = async (req, res) => {
   try {
@@ -309,6 +310,60 @@ const updateWishList = async (req, res) => {
   }
 };
 
+const addItemToPurchaseHistory = async (req, res) => {
+  const id = req.params.id; // ID del usuario
+  const { purchaseId, items, purchaseDate } = req.body;
+
+  if (typeof purchaseId !== "string" || !Array.isArray(items)) {
+    return res.status(400).send({ error: "Invalid data format" });
+  }
+
+  for (const item of items) {
+    if (
+      !mongooselib.Types.ObjectId.isValid(item.productId) ||
+      typeof item.quantity !== "number"
+    ) {
+      return res.status(400).send({ error: "Invalid item format" });
+    }
+  }
+
+  try {
+    const userExists = await userModel.findById(id); // Verificar si el usuario existe
+    if (!userExists) {
+      return res.status(404).send({ error: "User not found" });
+    }
+
+    // Verificar si el purchaseId ya existe en el historial de compras del usuario
+    const existingPurchase = userExists.purchaseHistory.find(
+      (history) => history.purchaseId === purchaseId
+    );
+
+    if (existingPurchase) {
+      return res.status(400).send({ error: "Purchase ID already exists" });
+    }
+
+    // Actualizar el historial de compras
+    const updatedUser = await userModel.findByIdAndUpdate(
+      id,
+      {
+        $push: {
+          purchaseHistory: {
+            purchaseId,
+            purchaseDate,
+            items,
+          },
+        },
+      },
+      { new: true, runValidators: true }
+    );
+
+    res.send(updatedUser);
+  } catch (error) {
+    console.error("Error updating purchase history:", error);
+    res.status(500).send({ error: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   getUsers,
   userById,
@@ -322,4 +377,5 @@ module.exports = {
   deleteProductFromShoppingCart,
   deleteProductFromWishList,
   updateQuantityShoppingCart,
+  addItemToPurchaseHistory,
 };

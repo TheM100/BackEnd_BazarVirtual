@@ -14,6 +14,7 @@ const {
   deleteProductFromShoppingCart,
   deleteProductFromWishList,
   updateQuantityShoppingCart,
+  addItemToPurchaseHistory,
 } = require("../controllers/usersControllers");
 
 router.get("/", getUsers);
@@ -39,6 +40,8 @@ router.put("/updateQuantityShoppingCart/:id", updateQuantityShoppingCart);
 router.put("/wishList/:id", updateWishList);
 
 router.put("/deleteWishListItem/:id", deleteProductFromWishList);
+
+router.put("/purchase-history/:id", addItemToPurchaseHistory);
 // router.delete("/:id", async (req, res) => {
 //   try {
 //     const userId = req.params.id;
