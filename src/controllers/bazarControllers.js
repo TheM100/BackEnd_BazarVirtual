@@ -6,8 +6,9 @@ const bcrypt = require("bcrypt");
 const usersBazarModel = require("../models/bazar/bazarUsers");
 
 //subir imagen:
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
+
 
 //configuration AWS S3
 AWS.config.update({
@@ -163,55 +164,55 @@ const createDate = async (req, res) => {
   }
 };
 
-const registerUserBazar = async (req, res) => {
-  const { username, email, webPage, socialNetworks, password, role } = req.body;
-
-  try {
-    const existingMail = await usersBazarModel.findOne({ email: email });
-    const existingBazarName = await usersBazarModel.findOne({
-      username: username,
-    });
-    if (existingMail) {
-      return res
-        .status(400)
-        .send({ msg: "El correo electrónico ya está registrado." });
-    }
-    if (existingBazarName) {
-      return res
-        .status(400)
-        .send({ msg: "Nombre de usuario registrado, prueba con otro." });
-    }
-
-    // Encriptar la contraseña
-    const salt = await bcrypt.genSalt(10);
-    const encryptedPassword = await bcrypt.hash(password, salt);
-
-    let parsedSocialNetworks = [];
-    if (Array.isArray(socialNetworks)) {
-      parsedSocialNetworks = socialNetworks.map((network) => ({
-        platform: network.platform,
-        url: network.url,
-      }));
-    }
-
-    const user = new usersBazarModel({
-      username,
-      email,
-      webPage: "",
-      socialNetworks: parsedSocialNetworks,
-      profilePicture:
-        "https://i.pinimg.com/236x/c4/02/5d/c4025d4031edfa78ce3dd60a144f77ed.jpg",
-      password: encryptedPassword,
-      role,
-    });
-
-    await user.save();
-    res.status(200).send({ msg: "Usuario creado con éxito!" });
-  } catch (error) {
-    console.error(`Error creating user: ${error.message}`);
-    res.status(400).send({ msg: "Usuario no guardado", error: error });
-  }
-};
+const registerUserBazar = async (res, req) => {
+        const { username, email, webPage, socialNetworks, password, role } = req.body;
+      
+        try {
+          const existingMail = await usersBazarModel.findOne({ email: email });
+          const existingBazarName = await usersBazarModel.findOne({
+            username: username,
+          });
+          if (existingMail) {
+            return res
+              .status(400)
+              .send({ msg: "El correo electrónico ya está registrado." });
+          }
+          if (existingBazarName) {
+            return res
+              .status(400)
+              .send({ msg: "Nombre de usuario registrado, prueba con otro." });
+          }
+      
+          // Encriptar la contraseña
+          const salt = await bcrypt.genSalt(10);
+          const encryptedPassword = await bcrypt.hash(password, salt);
+      
+          let parsedSocialNetworks = [];
+          if (Array.isArray(socialNetworks)) {
+            parsedSocialNetworks = socialNetworks.map((network) => ({
+              platform: network.platform,
+              url: network.url,
+            }));
+          }
+      
+          const user = new usersBazarModel({
+            username,
+            email,
+            webPage: "",
+            socialNetworks: parsedSocialNetworks,
+            profilePicture:
+              "https://i.pinimg.com/236x/c4/02/5d/c4025d4031edfa78ce3dd60a144f77ed.jpg",
+            password: encryptedPassword,
+            role,
+          });
+      
+          await user.save();
+          res.status(200).send({ msg: "Usuario creado con éxito!" });
+        } catch (error) {
+          console.error(`Error creating user: ${error.message}`);
+          res.status(400).send({ msg: "Usuario no guardado", error: error });
+        }
+      }
 
 const updateProfileBazar = async (req, res) => {
   const _id = req.params.id;
