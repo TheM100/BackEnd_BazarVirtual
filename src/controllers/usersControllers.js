@@ -2,21 +2,21 @@ const bcrypt = require("bcrypt");
 const userModel = require("../models/clients/users");
 const usersBazarModel = require("../models/bazar/bazarUsers");
 const userMarcaModel = require("../models/marca/usersMarca");
-const { v4: uuidv4 } = require('uuid');
-const mime = require('mime-types');
-const AWS = require('aws-sdk');
+const { v4: uuidv4 } = require("uuid");
+const mime = require("mime-types");
+const AWS = require("aws-sdk");
 const createJWT = require("../middlewares/authentication");
+const mongooselib = require("mongoose");
 
 //subir imagen:
-const fs = require('fs');
-const path = require('path');
-
+const fs = require("fs");
+const path = require("path");
 
 //configuration AWS S3
 AWS.config.update({
   accessKeyId: process.env.ACCESS_KEY_AWS,
   secretAccessKey: process.env.SECRET_ACCES_KEY_AWS,
-  region: process.env.REGION_AWS
+  region: process.env.REGION_AWS,
 });
 
 const s3 = new AWS.S3();
@@ -328,31 +328,90 @@ const updateWishList = async (req, res) => {
   }
 };
 
-const updateProfileUser = async (req, res) =>{
-  const id = req.params.id
-   const { password, profilePicture } = req.body;
+const addItemToPurchaseHistory = async (req, res) => {
+  const id = req.params.id; // ID del usuario
+  const { purchaseId, items, purchaseDate } = req.body;
 
-   try {
+  if (typeof purchaseId !== "string" || !Array.isArray(items)) {
+    return res.status(400).send({ error: "Invalid data format" });
+  }
+
+  for (const item of items) {
+    if (
+      !mongooselib.Types.ObjectId.isValid(item.productId) ||
+      typeof item.quantity !== "number"
+    ) {
+      return res.status(400).send({ error: "Invalid item format" });
+    }
+  }
+
+  try {
+    const userExists = await userModel.findById(id); // Verificar si el usuario existe
+    if (!userExists) {
+      return res.status(404).send({ error: "User not found" });
+    }
+
+    // Verificar si el purchaseId ya existe en el historial de compras del usuario
+    const existingPurchase = userExists.purchaseHistory.find(
+      (history) => history.purchaseId === purchaseId
+    );
+
+    if (existingPurchase) {
+      return res.status(400).send({ error: "Purchase ID already exists" });
+    }
+
+    // Actualizar el historial de compras
+    const updatedUser = await userModel.findByIdAndUpdate(
+      id,
+      {
+        $push: {
+          purchaseHistory: {
+            purchaseId,
+            purchaseDate,
+            items,
+          },
+        },
+      },
+      { new: true, runValidators: true }
+    );
+
+    res.send(updatedUser);
+  } catch (error) {
+    console.error("Error updating purchase history:", error);
+    res.status(500).send({ error: "Internal Server Error" });
+  }
+};
+
+const updateProfileUser = async (req, res) => {
+  const id = req.params.id;
+  const { password, profilePicture } = req.body;
+
+  try {
     const user = await userModel.findById(id);
-    
+
     if (!user) {
       return res.status(404).send("Usuario no encontrado");
     }
 
     if (profilePicture) {
       // Detectar el tipo MIME y la extensión de la imagen
-      const match = profilePicture.match(/^data:(image\/(jpeg|png|gif|bmp|tiff));base64,/);
+      const match = profilePicture.match(
+        /^data:(image\/(jpeg|png|gif|bmp|tiff));base64,/
+      );
       if (!match) {
         // console.log("extencion no soportada")
-       return res.status(400).send({ msg: 'Tipo de imagen no soportada.' });
+        return res.status(400).send({ msg: "Tipo de imagen no soportada." });
       }
 
       const mimeType = match[1];
-      const extname = mime.extension(mimeType) || 'jpeg'; 
+      const extname = mime.extension(mimeType) || "jpeg";
 
       // Extraer el base64 de la cadena
-      const base64Data = profilePicture.replace(/^data:image\/(jpeg|png|gif|bmp|tiff);base64,/, '');
-      const buffer = Buffer.from(base64Data, 'base64');
+      const base64Data = profilePicture.replace(
+        /^data:image\/(jpeg|png|gif|bmp|tiff);base64,/,
+        ""
+      );
+      const buffer = Buffer.from(base64Data, "base64");
 
       // Generar el nombre del archivo con un UUID y la extensión detectada
       const fileName = `${uuidv4()}_${Date.now()}.${extname}`;
@@ -367,28 +426,22 @@ const updateProfileUser = async (req, res) =>{
 
       // Subir archivo a S3
       const data = await s3.upload(s3Params).promise();
-      user.profilePicture = data.Location; 
+      user.profilePicture = data.Location;
     }
 
-    if(password){
-        const salt = await bcrypt.genSalt(10);
-        const encryptedPassword = await bcrypt.hash(password, salt);
-        user.password = encryptedPassword;
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      const encryptedPassword = await bcrypt.hash(password, salt);
+      user.password = encryptedPassword;
     }
-
-    
 
     await user.save();
-    res.status(200).send({ msg: 'Perfil actualizado satisfactoriamente.' });
-
+    res.status(200).send({ msg: "Perfil actualizado satisfactoriamente." });
   } catch (error) {
     console.error(error);
     res.status(400).send("Error al actualizar el perfil del usuario");
   }
 };
-
-
-
 
 module.exports = {
   getUsers,
@@ -404,4 +457,5 @@ module.exports = {
   deleteProductFromWishList,
   updateProfileUser,
   updateQuantityShoppingCart,
+  addItemToPurchaseHistory,
 };
