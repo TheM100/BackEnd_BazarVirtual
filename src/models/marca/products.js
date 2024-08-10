@@ -34,3 +34,4 @@ const productsSchema = new mongooselib.Schema({
 const productsModel = mongooselib.model("Products", productsSchema, "products"); //primer parametro:nombre_modelo, segundo parametro: nombre_esquema_a_utilizar, tercer parametro: nombre-de-coleccion-en-la-BD
 
 module.exports = productsModel;
+

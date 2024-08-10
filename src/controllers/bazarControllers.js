@@ -269,12 +269,13 @@ const updateProfileBazar = async (req, res) => {
     res.status(200).send({ msg: "Perfil actualizado satisfactoriamente." });
   } catch (error) {
     console.error(error);
-    res.status(400).send("Error al actualizar el perfil del usuario");
+    res.status(400).send({msg:"Error al actualizar el perfil del usuario"});
   }
 };
 
 const updateMarcasCurso = async (req, res) => {
   const _id = req.params.id;
+  console.log(_id)
   const { profile, nameMarca } = req.body; //agregar el perfilPicture
   try {
     const date = await dateBazarModel.findById(_id);
@@ -283,7 +284,14 @@ const updateMarcasCurso = async (req, res) => {
       return res.status(404).send("Fecha no encontrada");
     }
 
+    const checkParticipation = date.marcasCurso.some(marca => marca.nameMarca === nameMarca);
+
+    if (checkParticipation) {
+      return res.status(400).send({msg:"Ya estas participando en esta Fecha."});
+    }
+
     date.marcasCurso.push({ profile, nameMarca });
+    console.log(date.marcasCurso)
 
     await date.save();
 
