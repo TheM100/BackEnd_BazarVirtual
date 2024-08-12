@@ -16,7 +16,6 @@ connect();
 // app.use(cors({ origin: "http://localhost:3000" }));
 const allowedOrigins = [
   "http://localhost:3000",
-  "http://www.localhost:3000",
   "https://bazarvirtual.vercel.app",
 ];
 

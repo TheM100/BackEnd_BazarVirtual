@@ -4,21 +4,30 @@ const URI = `mongodb+srv://${process.env.USER_DB}:${process.env.PASSWORD_DB}@baz
 //@bazarvirtual.ns1cbbc.mongodb.net/
 // @firtsdb.1bgnhei.mongodb.net/
 async function connect() {
-  //esta funcion es la que realiza la conexion, siempre tiene que estar precente para cualquier backEnd que utilize mongoose
   try {
-    let connection = await mongooselib.connect(URI);
+    let connection = await mongooselib.connect(URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000, // Ajuste del tiempo de espera
+    });
     if (connection) {
-      console.log("Conexion a la BD establecida correctamente");
+      console.log("Conexión a la BD establecida correctamente");
     }
   } catch (error) {
+    console.error("Error al conectar a la base de datos:", error.message);
     throw new Error(error);
-    // console.log(error)
   }
 }
 
 function disconnect() {
-  //esta funcion por otra parte invoca al metodo disconnect para dejar la conexion
-  mongooselib.disconnect();
+  mongooselib
+    .disconnect()
+    .then(() => {
+      console.log("Desconexión de la BD exitosa");
+    })
+    .catch((error) => {
+      console.error("Error al desconectar de la base de datos:", error.message);
+    });
 }
 
 module.exports = {
