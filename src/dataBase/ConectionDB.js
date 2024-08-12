@@ -2,6 +2,7 @@ const mongooselib = require("mongoose");
 
 const URI = `mongodb+srv://${process.env.USER_DB}:${process.env.PASSWORD_DB}@bazarvirtual.ns1cbbc.mongodb.net/${process.env.NAME_DB}`;
 //@bazarvirtual.ns1cbbc.mongodb.net/
+// @firtsdb.1bgnhei.mongodb.net/
 async function connect() {
   //esta funcion es la que realiza la conexion, siempre tiene que estar precente para cualquier backEnd que utilize mongoose
   try {

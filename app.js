@@ -6,6 +6,7 @@ const PORT = 3001;
 
 const userRoutes = require("./src/Routes/UserRoutes");
 const productRoutes = require("./src/Routes/ProductsRoutes");
+const ordersRoutes = require("./src/Routes/ordersRoutes");
 const bazarRoutes = require("./src/Routes/bazarRoutes");
 const marcaRoutes = require("./src/Routes/marcaRoutes");
 const { connect } = require("./src/dataBase/ConectionDB");
@@ -36,6 +37,7 @@ app.get("/", (req, res) => {
 
 app.use("/users", userRoutes);
 app.use("/products", productRoutes);
+app.use("/orders", ordersRoutes);
 app.use("/bazar", bazarRoutes);
 app.use("/marca", marcaRoutes);
 
