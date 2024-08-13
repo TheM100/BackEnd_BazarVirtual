@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const multer = require("multer");
 const validateDate = require("../middlewares/bazarMiddle");
 
 const {
@@ -16,7 +15,8 @@ const {
   updateMarcasCurso,
   updateDateBazar,
   deleteSpecialEvent,
-  deteleOfMarcasCurso
+  deteleOfMarcasCurso,
+  deleteDate
 } = require("../controllers/bazarControllers");
 
 
@@ -47,5 +47,7 @@ router.put("/updateDateBazar/:id", updateDateBazar);
 router.put("/deleteSubscription/:id", deteleOfMarcasCurso);
 
 router.delete("/datesBazares/:bazarId/events/:eventId", deleteSpecialEvent);
+
+router.delete("/deleteDate/:id", deleteDate)
 
 module.exports = router;
