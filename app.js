@@ -2,7 +2,7 @@ require("dotenv").config(); //metodo para invocar variables de desarrollo
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 const userRoutes = require("./src/Routes/UserRoutes");
 const productRoutes = require("./src/Routes/ProductsRoutes");
@@ -14,7 +14,10 @@ const { connect } = require("./src/dataBase/ConectionDB");
 //Comentario test
 connect();
 // app.use(cors({ origin: "http://localhost:3000" }));
-const allowedOrigins = ["http://localhost:3000", "http://www.localhost:3000"];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://bazarvirtual.vercel.app",
+];
 
 app.use(
   cors({
@@ -25,6 +28,9 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"],
+    credentials: true,
   })
 );
 
