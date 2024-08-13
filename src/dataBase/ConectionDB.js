@@ -6,7 +6,6 @@ const URI = `mongodb+srv://${process.env.USER_DB}:${process.env.PASSWORD_DB}@baz
 async function connect() {
   try {
     let connection = await mongooselib.connect(URI, {
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 5000, // Ajuste del tiempo de espera
     });
     if (connection) {
