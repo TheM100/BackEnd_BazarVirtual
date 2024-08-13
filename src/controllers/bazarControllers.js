@@ -164,8 +164,9 @@ const createDate = async (req, res) => {
   }
 };
 
-const registerUserBazar = async (res, req) => {
+const registerUserBazar = async (req, res) => {
         const { username, email, webPage, socialNetworks, password, role } = req.body;
+     
       
         try {
           const existingMail = await usersBazarModel.findOne({ email: email });
@@ -273,10 +274,10 @@ const updateProfileBazar = async (req, res) => {
   }
 };
 
-const updateMarcasCurso = async (req, res) => {
+const updateMarcasCurso = async (req, res) => {   //aqui modifique , le puse marcaID
   const _id = req.params.id;
   console.log(_id)
-  const { profile, nameMarca } = req.body; //agregar el perfilPicture
+  const { profile, nameMarca, marcaID } = req.body; //agregar el perfilPicture
   try {
     const date = await dateBazarModel.findById(_id);
 
@@ -290,7 +291,7 @@ const updateMarcasCurso = async (req, res) => {
       return res.status(400).send({msg:"Ya estas participando en esta Fecha."});
     }
 
-    date.marcasCurso.push({ profile, nameMarca });
+    date.marcasCurso.push({ profile, nameMarca, marcaID });
     console.log(date.marcasCurso)
 
     await date.save();
@@ -373,6 +374,23 @@ const deteleOfMarcasCurso = async (req, res) => {
   }
 };
 
+const deleteDate = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Encuentra y elimina el documento con el id proporcionado
+    const deletedBazar = await dateBazarModel.findOneAndDelete({ _id: id });
+
+    if (!deletedBazar) {
+      return res.status(404).send('Bazar no encontrado');
+    }
+
+    res.status(200).send({msg:"Fecha cancelada con exito!"});
+  } catch (error) {
+    res.status(500).send('Error al eliminar el Bazar');
+  }
+};
+
 
 module.exports = {
   getDatesBazar,
@@ -387,5 +405,6 @@ module.exports = {
   updateMarcasCurso,
   updateDateBazar,
   deleteSpecialEvent,
-  deteleOfMarcasCurso
+  deteleOfMarcasCurso,
+  deleteDate
 };
