@@ -1,6 +1,6 @@
 const mongooselib = require("mongoose");
 
-const URI = `mongodb+srv://${process.env.USER_DB}:${process.env.PASSWORD_DB}@bazarvirtual.ns1cbbc.mongodb.net/${process.env.NAME_DB}`;
+const URI = `mongodb+srv://${process.env.USER_DB}:${process.env.PASSWORD_DB}@firtsdb.1bgnhei.mongodb.net/${process.env.NAME_DB}`;
 //@bazarvirtual.ns1cbbc.mongodb.net/
 // @firtsdb.1bgnhei.mongodb.net/
 async function connect() {

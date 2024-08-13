@@ -345,6 +345,35 @@ const deleteSpecialEvent = async (req, res) => {
   }
 };
 
+const deteleOfMarcasCurso = async (req, res) => {
+  const _id = req.params.id;
+  const { nameMarca } = req.body;
+
+  try {
+    const date = await dateBazarModel.findById(_id);
+
+    if (!date) {
+      return res.status(404).send("Fecha no encontrada");
+    }
+
+    const index = date.marcasCurso.findIndex(marca => marca.nameMarca === nameMarca);
+    // console.log(index)
+    if (index !== -1 ) {
+      date.marcasCurso.splice(index, 1);
+    }else{
+       return res.status(401).send({msg:"No estas participando en esta fecha"})
+    }
+
+    const updatedMarcas = await date.save();
+
+    res.status(200).send({msg:"Suscripcion cancelada con exito"});
+
+  } catch (error) {
+    res.status(500).send("Error al actualizar las marcas en la fecha deseada");
+  }
+};
+
+
 module.exports = {
   getDatesBazar,
   getUsersBazar,
@@ -358,4 +387,5 @@ module.exports = {
   updateMarcasCurso,
   updateDateBazar,
   deleteSpecialEvent,
+  deteleOfMarcasCurso
 };

@@ -16,10 +16,11 @@ const {
   updateMarcasCurso,
   updateDateBazar,
   deleteSpecialEvent,
+  deteleOfMarcasCurso
 } = require("../controllers/bazarControllers");
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+
+
 
 router.get("/", getDatesBazar);
 
@@ -37,12 +38,13 @@ router.post("/createDate", validateDate, createDate);
 
 router.post("/register", registerUserBazar);
 
-// router.put("/updateProfile/:id", upload.single('imagen'), updateProfileBazar );
 router.put("/updateProfile/:id", updateProfileBazar );
 
 router.put("/updateMarcasCurso/:id", updateMarcasCurso);
 
 router.put("/updateDateBazar/:id", updateDateBazar);
+
+router.put("/deleteSubscription/:id", deteleOfMarcasCurso);
 
 router.delete("/datesBazares/:bazarId/events/:eventId", deleteSpecialEvent);
 
