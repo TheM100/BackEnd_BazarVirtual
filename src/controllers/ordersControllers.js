@@ -1,46 +1,60 @@
 const mongoose = require("mongoose");
 
 const ordersModel = require("../models/orders/orders");
+const productsModel = require("../models/marca/products");
+const userMarcaModel = require("../models/marca/usersMarca");
 
 const postNewPurchase = async (req, res) => {
   try {
     const { purchaseId, purchaseDate, products, clientId } = req.body;
+    console.log("Received data:", req.body);
+
+    // Crear una nueva lista de productos con la información adicional
+    const updatedProducts = await Promise.all(
+      products.map(async (product) => {
+        const productDetails = await productsModel
+          .findById(product.productId)
+          .select("title productImage");
+        const brandDetails = await userMarcaModel
+          .findById(product.brandId)
+          .select("username profilePicture");
+
+        return {
+          ...product,
+          productTitle: productDetails.title,
+          productImage: productDetails.productImage,
+          brandUsername: brandDetails.username,
+          brandProfilePicture: brandDetails.profilePicture,
+        };
+      })
+    );
 
     const newPurchase = await ordersModel.create({
       purchaseId,
       purchaseDate,
-      products,
+      products: updatedProducts,
       clientId,
     });
 
     res.status(201).json({ success: true, data: newPurchase });
   } catch (error) {
+    console.error("Error in postNewPurchase:", error);
+
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
 const getFromClient = async (req, res) => {
   try {
     const { clientId } = req.params;
 
-    const clientPurchases = await ordersModel
-      .find({ clientId: clientId })
-      .populate({
-        path: "products.productId",
-        model: "Products", // Popula el productId con el modelo Products
-      })
-      .populate({
-        path: "products.brandId",
-        model: "UsersMarca", // Popula el brandId con el modelo UsersMarca
-        select: "username profilePicture", // Selecciona solo los campos username y profilePicture
-      });
+    const clientPurchases = await ordersModel.find({ clientId: clientId });
 
-    // Extraer, aplanar los productos y agregar el purchaseId a cada producto
     const products = clientPurchases.flatMap((purchase) =>
       purchase.products.map((product) => ({
-        ...product.toObject(), // Convertimos el subdocumento a un objeto regular
-        productId: product.productId, // Aquí el productId ya debe estar populado
-        brandId: product.brandId, // Aquí el brandId ya debe estar populado
-        purchaseId: purchase.purchaseId, // Agregamos el purchaseId correspondiente
+        ...product.toObject(),
+
+        purchaseId: purchase.purchaseId,
       }))
     );
 
@@ -54,35 +68,23 @@ const getFromBrand = async (req, res) => {
   try {
     const { brandId } = req.params;
 
-    // Convertir brandId a ObjectId si es necesario
     const brandObjectId = mongoose.Types.ObjectId.isValid(brandId)
       ? new mongoose.Types.ObjectId(brandId)
       : brandId;
 
-    // Buscar todas las compras que incluyan productos de la marca específica y hacer la población
-    const brandPurchases = await ordersModel
-      .find({ "products.brandId": brandObjectId })
-      .populate({
-        path: "products.productId",
-        model: "Products",
-      })
-      .populate({
-        path: "products.brandId",
-        model: "UsersMarca",
-        select: "username profilePicture",
-      });
+    const brandPurchases = await ordersModel.find({
+      "products.brandId": brandObjectId,
+    });
 
-    // Extraer, filtrar y aplanar productos cuyo brandId coincide
     const products = brandPurchases.flatMap((purchase) =>
       purchase.products
         .filter(
           (product) =>
-            product.brandId._id.toString() === brandObjectId.toString() // Comparar ID como string
+            product.brandId._id.toString() === brandObjectId.toString()
         )
         .map((product) => ({
           ...product.toObject(),
-          productId: product.productId,
-          brandId: product.brandId,
+
           purchaseId: purchase.purchaseId,
         }))
     );
