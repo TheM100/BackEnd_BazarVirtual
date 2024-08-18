@@ -87,15 +87,7 @@ const getShoppingCartUser = async (req, res) => {
 };
 
 const registerUser = async (req, res) => {
-  const {
-    username,
-    email,
-    role,
-    password,
-    shoppingCart,
-    wishList,
-    purchaseHistory,
-  } = req.body;
+  const { username, email, role, password, shoppingCart, wishList } = req.body;
   try {
     const existingMail = await userModel.findOne({ email: email });
     const existingUsername = await userModel.findOne({ username: username });
@@ -121,13 +113,13 @@ const registerUser = async (req, res) => {
       role: role || "cliente",
       shoppingCart: shoppingCart || [],
       wishList: wishList || [],
-      purchaseHistory: purchaseHistory || [],
     });
 
     await user.save();
     res.status(200).send({ msg: "Usuario creado con éxito!" });
   } catch (error) {
     res.status(400).send({ msg: "Usuario no guardado", Error: error });
+    console.log(error);
   }
 };
 
