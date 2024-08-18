@@ -1,7 +1,6 @@
 const mongooselib = require("mongoose");
 const wishListSchema = require("./schemaAux/wishList");
 const shoppingCartSchema = require("./schemaAux/shoppingCart");
-const purchaseHistorySchema = require("./schemaAux/purchaseHistory");
 
 const userSchema = new mongooselib.Schema({
   username: {
@@ -32,9 +31,7 @@ const userSchema = new mongooselib.Schema({
   },
   shoppingCart: { type: [shoppingCartSchema] },
   wishList: { type: [wishListSchema] },
-  purchaseHistory: { type: [purchaseHistorySchema] },
 });
-
 
 const userModel = mongooselib.model("Users", userSchema, "users"); //primer parametro:nombre_modelo, segundo parametro: nombre_esquema_a_utilizar, tercer parametro: nombre-de-coleccion-en-la-BD
 
