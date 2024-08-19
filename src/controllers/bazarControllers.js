@@ -5,9 +5,6 @@ const dateBazarModel = require("../models/bazar/newDateBazar");
 const bcrypt = require("bcrypt");
 const usersBazarModel = require("../models/bazar/bazarUsers");
 
-//subir imagen:
-const fs = require('fs');
-const path = require('path');
 
 
 //configuration AWS S3
