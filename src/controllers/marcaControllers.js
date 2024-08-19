@@ -1,5 +1,17 @@
 const bcrypt = require("bcrypt");
 const userMarcaModel = require("../models/marca/usersMarca");
+const { v4: uuidv4 } = require("uuid");
+const mime = require("mime-types");
+const AWS = require("aws-sdk");
+
+//configuration AWS S3
+AWS.config.update({
+  accessKeyId: process.env.ACCESS_KEY_AWS,
+  secretAccessKey: process.env.SECRET_ACCES_KEY_AWS,
+  region: process.env.REGION_AWS,
+});
+
+const s3 = new AWS.S3();
 
 const getUSersMarca = async (req, res) => {
   try {
@@ -91,12 +103,48 @@ const registerMarca = async (req, res) => {
 
 const updateProfileMarca = async (req, res) => {
   const _id = req.params.id;
-  const { socialNetworks, slogan, description, username } = req.body; //agregar el perfilPicture
+  const { socialNetworks, slogan, description, username, profilePicture } = req.body; //agregar el perfilPicture
   try {
     const user = await userMarcaModel.findById(_id);
 
     if (!user) {
       return res.status(404).send("Usuario no encontrado");
+    }
+
+    if (profilePicture) {
+      // Detectar el tipo MIME y la extensión de la imagen
+      const match = profilePicture.match(
+        /^data:(image\/(jpeg|png|gif|bmp|tiff));base64,/
+      );
+      if (!match) {
+        console.log("extencion no soportada");
+        return res.status(400).send({ msg: "Tipo de imagen no soportada." });
+      }
+
+      const mimeType = match[1];
+      const extname = mime.extension(mimeType) || "jpeg";
+
+      // Extraer el base64 de la cadena
+      const base64Data = profilePicture.replace(
+        /^data:image\/(jpeg|png|gif|bmp|tiff);base64,/,
+        ""
+      );
+      const buffer = Buffer.from(base64Data, "base64");
+
+      // Generar el nombre del archivo con un UUID y la extensión detectada
+      const fileName = `${uuidv4()}_${Date.now()}.${extname}`;
+
+      // Definir parámetros de S3
+      const s3Params = {
+        Bucket: process.env.BUCKET_NAME,
+        Key: `profilePicturesMarcas/${fileName}`,
+        Body: buffer,
+        ContentType: mimeType, // Usa el tipo MIME detectado
+      };
+
+      // Subir archivo a S3
+      const data = await s3.upload(s3Params).promise();
+      user.profilePicture = data.Location;
     }
 
     if (username) user.username = username;
