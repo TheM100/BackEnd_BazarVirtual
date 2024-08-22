@@ -11,7 +11,6 @@ const userMarcaModel = require("../models/marca/usersMarca");
 const postNewPurchase = async (req, res) => {
   try {
     const { purchaseId, purchaseDate, products, clientId } = req.body;
-    console.log("Received data:", req.body);
 
     // Crear una nueva lista de productos con la información adicional
     const updatedProducts = await Promise.all(

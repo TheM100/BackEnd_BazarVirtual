@@ -391,7 +391,6 @@ const updateProfileUser = async (req, res) => {
         /^data:(image\/(jpeg|png|gif|bmp|tiff));base64,/
       );
       if (!match) {
-        // console.log("extencion no soportada")
         return res.status(400).send({ msg: "Tipo de imagen no soportada." });
       }
 

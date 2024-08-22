@@ -97,7 +97,6 @@ const getDateById = async (req, res) => {
     const idDate = req.params.dateId;
 
     const date = await dateBazarModel.findById(idDate);
-    // console.log(date)
     if (date) {
       res.status(200).json({
         success: true,
@@ -124,8 +123,7 @@ const getDatesOfUserBazar = async (req, res) => {
     const idUser = req.params._idUser;
 
     const dates = await dateBazarModel.find({ createdBy: `${idUser}` });
-    // console.log(dates)
-    if (dates) {
+ (dates) {
       res.status(200).json({
         success: true,
         message: "Dates de tu bazar:",
@@ -149,7 +147,6 @@ const getDatesOfUserBazar = async (req, res) => {
 const createDate = async (req, res) => {
   try {
     let newDate = req.body;
-    //  console.log('newDate ', newDate);
     const date = await dateBazarModel.create(newDate);
 
     res.status(201).send({ msg: "Fecha Creada con exito!" });
@@ -273,7 +270,6 @@ const updateProfileBazar = async (req, res) => {
 
 const updateMarcasCurso = async (req, res) => {   //aqui modifique , le puse marcaID
   const _id = req.params.id;
-  console.log(_id)
   const { profile, nameMarca, marcaID } = req.body; //agregar el perfilPicture
   try {
     const date = await dateBazarModel.findById(_id);
@@ -289,7 +285,6 @@ const updateMarcasCurso = async (req, res) => {   //aqui modifique , le puse mar
     }
 
     date.marcasCurso.push({ profile, nameMarca, marcaID });
-    console.log(date.marcasCurso)
 
     await date.save();
 
@@ -355,7 +350,6 @@ const deteleOfMarcasCurso = async (req, res) => {
     }
 
     const index = date.marcasCurso.findIndex(marca => marca.nameMarca === nameMarca);
-    // console.log(index)
     if (index !== -1 ) {
       date.marcasCurso.splice(index, 1);
     }else{
