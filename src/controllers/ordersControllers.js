@@ -145,7 +145,7 @@ const newPaymentIntent = async (req, res) => {
     const purchaseDate = new Date().toISOString();
 
     const compactItems = items
-      .map((item) => `${item._id}:${item.quantity}`)
+      .map((item) => `${item.id}:${item.quantity}`)
       .join(",");
 
     // Crear el Payment Intent
@@ -189,6 +189,32 @@ const getPaymentIntent = async (req, res) => {
       .json({ error: `Internal Server Error: ${error.message}` });
   }
 };
+
+const getClientSecret = async (req, res) => {
+  if (req.method !== "GET") {
+    return res.status(405).send("Method not allowed");
+  }
+
+  const { paymentIntentId } = req.query;
+
+  if (!paymentIntentId) {
+    return res.status(400).json({ error: "PaymentIntentId is required" });
+  }
+
+  try {
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    res.status(200).json({
+      clientSecret: paymentIntent.client_secret,
+      amount: paymentIntent.amount,
+      quantity: paymentIntent.metadata.items,
+      paymentIntent: paymentIntent,
+    });
+  } catch (error) {
+    console.error("Error retrieving client secret:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 module.exports = {
   postNewPurchase,
   getFromClient,
@@ -196,4 +222,5 @@ module.exports = {
   deliveredTrue,
   newPaymentIntent,
   getPaymentIntent,
+  getClientSecret,
 };
