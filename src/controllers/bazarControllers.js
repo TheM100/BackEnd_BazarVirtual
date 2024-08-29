@@ -72,7 +72,7 @@ const getBazarDates = async (req, res) => {
       .find()
       .populate({
         path: "createdBy",
-        select: "profilePicture", // Selecciona solo la imagen de perfil del usuario
+        select: "profilePicture username", // Selecciona solo la imagen de perfil del usuario
       })
       .exec();
 
