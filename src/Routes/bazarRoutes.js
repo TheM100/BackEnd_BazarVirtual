@@ -16,7 +16,8 @@ const {
   updateDateBazar,
   deleteSpecialEvent,
   deteleOfMarcasCurso,
-  deleteDate
+  deleteDate,
+  updateEventsBazar
 } = require("../controllers/bazarControllers");
 
 
@@ -43,6 +44,8 @@ router.put("/updateProfile/:id", updateProfileBazar );
 router.put("/updateMarcasCurso/:id", updateMarcasCurso);
 
 router.put("/updateDateBazar/:id", updateDateBazar);
+
+router.put("/updateEventsBazar/:id", updateEventsBazar);
 
 router.put("/deleteSubscription/:id", deteleOfMarcasCurso);
 

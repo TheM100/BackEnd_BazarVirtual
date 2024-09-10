@@ -294,6 +294,25 @@ const updateMarcasCurso = async (req, res) => {
   }
 };
 
+const updateEventsBazar = async (req, res) => {
+ 
+  const _id = req.params.id;
+  const { eventos} = req.body; 
+  try {
+    const date = await dateBazarModel.findById(_id);
+    if (!date) {
+      return res.status(404).send("Fecha no encontrada");
+    }
+
+    date.events.push(...eventos);
+    await date.save();
+
+    res.send(date);
+  } catch (error) {
+    res.status(500).send({msg:error});
+  }
+};
+
 const updateDateBazar = async (req, res) => {
   const _id = req.params.id;
   const { place, date, time, events } = req.body;
@@ -400,4 +419,5 @@ module.exports = {
   deleteSpecialEvent,
   deteleOfMarcasCurso,
   deleteDate,
+  updateEventsBazar
 };
