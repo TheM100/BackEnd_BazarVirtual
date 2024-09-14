@@ -18,6 +18,7 @@ const allowedOrigins = [
   "http://localhost:3000",
   "https://bazarvirtual.vercel.app",
   "https://bazarvirtual.com.mx",
+  "https://www.bazarvirtual.com.mx",
 ];
 
 app.use(
